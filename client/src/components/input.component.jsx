@@ -12,7 +12,7 @@ export default function InputBox({
   const [passwordVisibility, setPasswordVisibility] =
     useState(false);
   return (
-    <div className='relative w-[100%] mb-4'>
+    <div className="relative w-[100%] mb-4">
       <input
         name={name}
         type={
@@ -24,7 +24,7 @@ export default function InputBox({
         }
         id={id}
         placeholder={placeholder}
-        className='input-box'
+        className="input-box"
         defaultValue={value}
       />
 
