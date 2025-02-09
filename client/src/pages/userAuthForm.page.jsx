@@ -19,19 +19,22 @@ export default function AuthForm({ type }) {
 
   console.log(access_token);
 
-  const userAuthThroughServer = (route, data) => {
-    axios
-      .post('http://localhost:3000' + route, data)
-      .then(({ data }) => {
-        storeInSession('user', JSON.stringify(data));
-        // console.log(sessionStorage);
-        setUserAuth(data);
-        toast.success('Logged in successfully');
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        toast.error('Error occurred during authentication');
-      });
+  const userAuthThroughServer = async (route, data) => {
+    try {
+      const response = await axios.post(`http://localhost:3000${route}`, data);
+
+      const userData = response.data;
+      storeInSession('user', JSON.stringify(userData));
+      setUserAuth(userData);
+
+      // Show success notification
+      toast.success('Authentication successful');
+    } catch (error) {
+      console.error('Authentication Error:', error);
+
+      // Show error notification
+      toast.error('Error occurred during authentication');
+    }
   };
 
   const handleSubmit = e => {
@@ -63,8 +66,6 @@ export default function AuthForm({ type }) {
       return toast.error('Invalid password format');
     }
 
-    // toast.success('Form submitted successfully!');
-
     // authThroughServer
     userAuthThroughServer(serverRoute, formData);
   };
@@ -73,14 +74,12 @@ export default function AuthForm({ type }) {
     e.preventDefault();
     authWithGoogle()
       .then(user => {
-        // console.log(user);
         let serverRoute = '/google-auth';
         let formData = {
           access_token: user.accessToken,
-        }
+        };
 
         userAuthThroughServer(serverRoute, formData);
-
       })
       .catch(err => {
         console.error(err);
