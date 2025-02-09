@@ -1,16 +1,12 @@
 const storeInSession = (key, value) => {
-  sessionStorage.setItem(key, JSON.stringify(value));
+  return sessionStorage.setItem(key, value);
 };
-
 const lookInSession = key => {
-  const data = sessionStorage.getItem(key);
-  return data ? JSON.parse(data) : null; // Return null if no data found
+  return sessionStorage.getItem(key); //! Retrieves the stored JWT token
 };
-
 const removeFromSession = key => {
-  sessionStorage.removeItem(key);
+  return sessionStorage.removeItem(key);
 };
-
 const logOutUser = () => {
   sessionStorage.clear();
 };
