@@ -22,9 +22,9 @@ const generateUsername = async email => {
 
 // Format data to send
 const formatDataToSend = user => {
-  const accessToken = jwt.sign({ id: user._id }, process.env.SECRET_KEY, { expiresIn: '5d' });
+  const access_token = jwt.sign({ id: user._id }, process.env.SECRET_KEY, { expiresIn: '5d' });
   return {
-    accessToken,
+    access_token,
     profile_img: user.personal_info.profile_img, 
     fullname: user.personal_info.fullname,
     username: user.personal_info.username,
