@@ -18,14 +18,14 @@ connectCloudinary();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use((req, res, next) => {
-  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
-  next();
+    res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+    next();
 });
 app.use(
-  fileUpload({
-    useTempFiles: true,
-    tempFileDir: '/tmp/',
-  }),
+    fileUpload({
+        useTempFiles: true,
+        tempFileDir: '/tmp/',
+    }),
 ); //* special middleware to upload files
 
 // Enable CORS
@@ -38,5 +38,5 @@ app.use('/', routes);
 // Start the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`👍👍Server is running on port ${PORT}`);
+    console.log(`👍👍Server is running on port ${PORT}`);
 });

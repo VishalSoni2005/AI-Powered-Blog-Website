@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# echo "server/blog-website-001-firebase-adminsdk-fbsvc-1cbf77c0ff.json" >> .gitignore
+echo "server/blog-website-001-firebase-adminsdk-fbsvc-1cbf77c0ff.json" >> .gitignore
+

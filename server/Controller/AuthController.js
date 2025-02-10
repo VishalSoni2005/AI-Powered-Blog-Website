@@ -7,7 +7,7 @@ import 'dotenv/config';
 //* * * * * * GOOGLE Auth * * * * * * \\
 import admin from 'firebase-admin';
 import { getAuth } from 'firebase-admin/auth';
-import serviceAccountKey from '../blog-website-001-firebase-adminsdk-fbsvc-1cbf77c0ff.json' assert { type: 'json' };
+import serviceAccountKey from '../../../blog-website-001-firebase-adminsdk-fbsvc-1cbf77c0ff.json' assert { type: 'json' };
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccountKey),

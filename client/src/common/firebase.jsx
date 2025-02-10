@@ -6,10 +6,10 @@ const firebaseConfig = {
   apiKey: 'AIzaSyDEJBdmLl_iVfo85BODAwVSkYdgRqqYESo',
   authDomain: 'blog-website-001.firebaseapp.com',
   projectId: 'blog-website-001',
-  storageBucket: 'blog-website-001.appspot.com', // Corrected storageBucket
+  storageBucket: 'blog-website-001.appspot.com', 
   messagingSenderId: '666691635401',
-  appId: '1:666691635401:web:5c45c3642288cda3e46518',
   measurementId: 'G-RMHEY1ZQED',
+  appId: '1:666691635401:web:5c45c3642288cda3e46518',
 };
 
 // Initialize Firebase
