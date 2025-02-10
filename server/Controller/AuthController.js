@@ -4,6 +4,15 @@ import jwt from 'jsonwebtoken';
 import { nanoid } from 'nanoid';
 import 'dotenv/config';
 
+//* * * * * * GOOGLE Auth * * * * * * \\
+import admin from 'firebase-admin';
+import { getAuth } from 'firebase-admin/auth';
+import serviceAccountKey from '../blog-website-001-firebase-adminsdk-fbsvc-1cbf77c0ff.json' assert { type: 'json' };
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccountKey),
+});
+
 // Regex validations
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
@@ -22,10 +31,10 @@ const generateUsername = async email => {
 
 // Format data to send
 const formatDataToSend = user => {
-  const access_token = jwt.sign({ id: user._id }, process.env.SECRET_KEY, { expiresIn: '5d' });
+  const access_token = jwt.sign({ id: user._id }, process.env.SECRET_KEY, { expiresIn: '1d' }); //* create access token
   return {
     access_token,
-    profile_img: user.personal_info.profile_img, 
+    profile_img: user.personal_info.profile_img,
     fullname: user.personal_info.fullname,
     username: user.personal_info.username,
   };
@@ -107,5 +116,57 @@ export const signin = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, message: 'Server Error, Unable to process request' });
+  }
+};
+
+export const googleAuth = async (req, res) => {
+  try {
+    const { access_token } = req.body;
+
+    if (!access_token) {
+      return res.status(400).json({ success: false, message: 'Access token is required' });
+    }
+
+    const decodedToken = await getAuth().verifyIdToken(access_token);
+    let { email, name, picture: image } = decodedToken;
+
+    // Ensure high-resolution profile image
+    if (image) {
+      image = image.replace('s96-c', 's384-c');
+    }
+
+    let existingUser = await User.findOne({ 'personal_info.email': email }).select(
+      'personal_info.fullname personal_info.username personal_info.profile_img google_auth',
+    );
+
+    if (existingUser) {
+      if (!existingUser.google_auth) {
+        return res.status(403).json({
+          success: false,
+          message:
+            'User is already registered with a different authentication method. Please try again.',
+        });
+      }
+    } else {
+      const username = await generateUsername(email); // Ensure uniqueness
+
+      const newUser = new User({
+        personal_info: {
+          fullname: name,
+          email,
+          username,
+          google_auth: true,
+        },
+      });
+
+      existingUser = await newUser.save();
+    }
+
+    return res.status(200).json(formatDataToSend(existingUser));
+  } catch (error) {
+    console.error('Error in Google Authentication:', error);
+    return res
+      .status(500)
+      .json({ success: false, message: 'Server Error, Unable to process request' });
   }
 };

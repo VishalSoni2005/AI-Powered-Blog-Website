@@ -17,7 +17,7 @@ export default function AuthForm({ type }) {
     setUserAuth,
   } = useContext(UserContext);
 
-  console.log(access_token);
+  console.log("Access Token is ===>> ", access_token);
 
   const userAuthThroughServer = async (route, data) => {
     try {
@@ -30,7 +30,7 @@ export default function AuthForm({ type }) {
       // Show success notification
       toast.success('Authentication successful');
     } catch (error) {
-      console.error('Authentication Error:', error);
+      console.error('Authentication Error ***:', error);
 
       // Show error notification
       toast.error('Error occurred during authentication');
@@ -76,7 +76,7 @@ export default function AuthForm({ type }) {
       .then(user => {
         let serverRoute = '/google-auth';
         let formData = {
-          access_token: user.accessToken,
+          access_token: user.access_token,
         };
 
         userAuthThroughServer(serverRoute, formData);

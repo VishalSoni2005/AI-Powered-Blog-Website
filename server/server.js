@@ -12,15 +12,19 @@ connectDB();
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use((req, res, next) => {
+  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+  next();
+});
 
 // Enable CORS
 app.use(cors());
-app.use(cors({ origin: 'http://localhost:5173' })); // If frontend runs on Vite
-
+app.use(cors({ origin: 'http://localhost:5173' }));
 
 // routes
 app.use('/', routes);
 
+// Start the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
