@@ -1,7 +1,7 @@
-
 import React, { useContext, useState } from 'react';
 import { Link, Outlet } from 'react-router-dom';
 import Logo from '../imgs/logo.png';
+// import logoTwo from '../imgs/pen.svg';
 
 import { UserContext } from '../App';
 import UserNavigationPanel from './user-navigation.component';
@@ -98,9 +98,6 @@ export default function Navbar() {
     </>
   );
 }
-
-
-
 
 // import React, { useContext, useState } from 'react';
 // import { Link, Outlet } from 'react-router-dom';
