@@ -6,6 +6,7 @@ import AnimationWrapper from "../common/page-animation";
 import EditorJs from "@editorjs/editorjs";
 import { tools } from "./tools.component";
 import { EditorContext } from "../pages/editor.pages";
+import axios from "axios";
 
 // import { uploadToCloudinary } from "../common/cloudinary";
 
@@ -19,32 +20,29 @@ export default function BlogEditor() {
     });
   }, []);
 
-  //todo
-  // const handleBannerUpload = async e => {
-  //   let img = e.target.files[0];
-  //   console.log("Image selected -> ", img);
+ // todo;
+  const handleBannerUpload = async e => {
+    let file = e.target.files[0];
+    console.log("Image selected -> ", file);
 
-  //   if (!img) return;
+    if (!file) return;
 
-  //   // Create FormData and append the file
-  //   let formData = new FormData();
-  //   formData.append("image", img);
+    // Create FormData and append the file
+    let formData = new FormData();
+    formData.append("file", file);
 
-  //   try {
-  //     const response = await fetch("http://localhost:3000/upload-banner-image", {
-  //       method: "POST",
-  //       body: formData,
-  //     });
+    try {
+      const response = await axios.post("http://localhost:3000/upload", formData);
 
-  //     const data = await response.json();
-  //     console.log("Uploaded Image URL:", data.imageUrl);
+      const data = await response.data;
+      console.log("Uploaded Image URL:", data.secure_url);
 
-  //     // Update the blog banner URL in state
-  //     // setBlog(prev => ({ ...prev, banner: data.imageUrl }));
-  //   } catch (error) {
-  //     console.error("Upload failed:", error);
-  //   }
-  // };
+      // Update the blog banner URL in state
+      setBlog(prev => ({ ...prev, banner: data.secure_url }));
+    } catch (error) {
+      console.error("Upload failed:", error);
+    }
+  };
 
   const handleTitleKeyDown = e => {
     if (e.key === "Enter" || e.keyCode === 13) {
@@ -95,7 +93,7 @@ export default function BlogEditor() {
                   type="file"
                   id="uploadBanner"
                   accept=".png, .jpg, .jpeg"
-                  // onChange={handleBannerUpload} //!edited
+                  onChange={handleBannerUpload} //!edited
                   hidden
                 />
               </label>
