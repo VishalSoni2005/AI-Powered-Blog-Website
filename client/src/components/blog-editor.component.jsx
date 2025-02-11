@@ -7,21 +7,44 @@ import EditorJs from "@editorjs/editorjs";
 import { tools } from "./tools.component";
 import { EditorContext } from "../pages/editor.pages";
 
-export default function BlogEditor() {
+// import { uploadToCloudinary } from "../common/cloudinary";
 
-    useEffect(() => {
-        let editor = new EditorJs({
-          holderId: "textEditor",
-          data: "",
-          tools: tools,
-          placeholder: "Let's Share Your Story",
-        });
-    }, []);
+export default function BlogEditor() {
+  useEffect(() => {
+    let editor = new EditorJs({
+      holderId: "textEditor",
+      data: "",
+      tools: tools,
+      placeholder: "Let's Share Your Story",
+    });
+  }, []);
+
   //todo
-  const handleBannerUpload = e => {
-    let img = e.target.files[0];
-    console.log(img);
-  }; //todo:
+  // const handleBannerUpload = async e => {
+  //   let img = e.target.files[0];
+  //   console.log("Image selected -> ", img);
+
+  //   if (!img) return;
+
+  //   // Create FormData and append the file
+  //   let formData = new FormData();
+  //   formData.append("image", img);
+
+  //   try {
+  //     const response = await fetch("http://localhost:3000/upload-banner-image", {
+  //       method: "POST",
+  //       body: formData,
+  //     });
+
+  //     const data = await response.json();
+  //     console.log("Uploaded Image URL:", data.imageUrl);
+
+  //     // Update the blog banner URL in state
+  //     // setBlog(prev => ({ ...prev, banner: data.imageUrl }));
+  //   } catch (error) {
+  //     console.error("Upload failed:", error);
+  //   }
+  // };
 
   const handleTitleKeyDown = e => {
     if (e.key === "Enter" || e.keyCode === 13) {
@@ -47,49 +70,48 @@ export default function BlogEditor() {
 
   return (
     <>
-      <nav className='navbar'>
-        <Link to='/' className='flex-none w-10'>
-          <img src={Logo} alt='Logo' />
+      <nav className="navbar">
+        <Link to="/" className="flex-none w-10">
+          <img src={Logo} alt="Logo" />
         </Link>
 
-        <p className='max-md:hidden text-black line-clamp-1 w-full'>
+        <p className="max-md:hidden text-black line-clamp-1 w-full">
           {title.length ? title : "New Blog"}
         </p>
 
-        <div className='flex gap-4 ml-auto'>
-          <button className='btn-dark py-2'>Publish</button>
-          <button className='btn-light py-2'>Save Draft</button>
+        <div className="flex gap-4 ml-auto">
+          <button className="btn-dark py-2">Publish</button>
+          <button className="btn-light py-2">Save Draft</button>
         </div>
       </nav>
 
       <AnimationWrapper>
         <section>
-          <div className='mx-auto max-w-[900px] w-full'>
-            <div className='relative aspect-video hover:opacity-80 bg-white border-4 border-grey '>
-              <label htmlFor='uploadBanner'>
-                <img src={BlogBanner} alt='Blog Banner' className='z-20' />
+          <div className="mx-auto max-w-[900px] w-full">
+            <div className="relative aspect-video hover:opacity-80 bg-white border-4 border-grey ">
+              <label htmlFor="uploadBanner">
+                <img src={BlogBanner} alt="Blog Banner" className="z-20" />
                 <input
-                  type='file'
-                  id='uploadBanner'
-                  accept='.png, .jpg, .jpeg'
-                  onChange={handleBannerUpload}
+                  type="file"
+                  id="uploadBanner"
+                  accept=".png, .jpg, .jpeg"
+                  // onChange={handleBannerUpload} //!edited
                   hidden
                 />
               </label>
             </div>
 
             <textarea
-              name='description'
-              placeholder='Blog Title'
-              className='text-4xl font-medium w-full h-20 outline-none resize-none mt-10 leading-tight placeholder:opacity-40 font-serif'
+              name="description"
+              placeholder="Blog Title"
+              className="text-4xl font-medium w-full h-20 outline-none resize-none mt-10 leading-tight placeholder:opacity-40 font-serif"
               onChange={handletitleChange}
               onKeyDown={handleTitleKeyDown}
-              id=''
-            ></textarea>
+              id=""></textarea>
 
             <hr
-              className='w-full 
-            opacity-40 my-10'
+              className="w-full 
+            opacity-40 my-10"
             />
 
             <div id="textEditor" className="font-gelasio"></div>
