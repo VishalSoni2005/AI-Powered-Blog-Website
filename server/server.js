@@ -28,7 +28,12 @@ app.use(
     }),
 ); //* special middleware to upload files
 
-// Enable CORS
+// ✅ Allow CORS for frontend
+app.use(cors({
+  origin: "*", // Allow all origins (Change this to your frontend URL for better security)
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type"],
+}));
 app.use(cors());
 app.use(cors({ origin: 'http://localhost:5173' }));
 
