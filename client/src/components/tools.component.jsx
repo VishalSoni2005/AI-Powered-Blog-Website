@@ -10,7 +10,7 @@ import InlineCode from "@editorjs/inline-code";
 import Header from "@editorjs/header";
 import CodeTool from "@editorjs/code"; // Import for code blocks
 
-const uploadImageByUrl = async url => {
+const uploadImageByUrl = async (url) => {
   let link = new Promise((resolve, reject) => {
     try {
       resolve(url);
@@ -18,28 +18,16 @@ const uploadImageByUrl = async url => {
       reject(err);
     }
   });
-  return link.then(url => {
+  return link.then((url) => {
     return {
       sucess: 1,
-      file: { url },
+      file: { url }
     };
   });
 };
-
-const uploadImageByFile = async file => {
-  let link = new Promise((resolve, reject) => {
-    try {
-      resolve(url);
-    } catch (err) {
-      reject(err);
-    }
-  });
-  return link.then(url => {
-    return {
-      sucess: 1,
-      file: { url },
-    };
-  });
+  //todo:
+const uploadImageByFile = async (file) => {
+    //todo: uploadImage(e).then( url => {})
 };
 
 export const tools = {
@@ -50,10 +38,10 @@ export const tools = {
       config: {
         uploader: {
           uploadByUrl: uploadImageByUrl,
-          uploadByFile: uploadImageByFile,
-        },
-      },
-    },
+          uploadByFile: uploadImageByFile
+        }
+      }
+    }
   },
   embed: Embed,
   header: {
@@ -61,18 +49,18 @@ export const tools = {
     inlineToolbar: true,
     config: {
       placeholder: "Enter header text...",
-      levels: [1, 2, 3, 4, 5, 6],
-    },
+      levels: [1, 2, 3, 4, 5, 6]
+    }
   },
   list: {
     class: List,
     inlineToolbar: true,
     config: {
-      type: "bullet", // or "numbered"
-    },
+      type: "bullet" // or "numbered"
+    }
   },
   quote: Quote,
   marker: Marker,
   inlineCode: InlineCode,
-  code: CodeTool, // Assign the correct tool
+  code: CodeTool // Assign the correct tool
 };
