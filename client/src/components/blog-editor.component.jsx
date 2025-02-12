@@ -7,7 +7,7 @@ import EditorJs from "@editorjs/editorjs";
 import { tools } from "./tools.component";
 import { EditorContext } from "../pages/editor.pages";
 import axios from "axios";
-import toast from "react-hot-toast";
+import { toast, Toaster } from "react-hot-toast";
 
 // import { uploadToCloudinary } from "../common/cloudinary";
 
@@ -21,7 +21,6 @@ export default function BlogEditor() {
     setTextEditor,
     setEditorState
   } = useContext(EditorContext);
-
 
   useEffect(() => {
     const editor = new EditorJs({
@@ -39,7 +38,6 @@ export default function BlogEditor() {
       }
     };
   }, []);
-
 
   // todo;
   const handleBannerUpload = async (e) => {
@@ -93,19 +91,16 @@ export default function BlogEditor() {
 
     console.log("public btn, Now Editor State ==> ", editorState);
 
-    // if (!title.length) {
-    //   // tells wheather title
-    //    toast.error("Please enter a title");
-    // }
+    if (!title.length) {
+      toast.error("Please enter a title");
+    }
 
     if (textEditor.isReady) {
       textEditor
         .save()
         .then((data) => {
           if (data.blocks.length) {
-            setBlog((prev) => ({ ...prev, content: data }));
-            console.log("blog here", blog, "and", data); // debug
-
+            setBlog({ ...blog, content: data });
             setEditorState("publish"); // Ensure this is called
           } else {
             toast.error("Please write something in the editor");
@@ -120,6 +115,7 @@ export default function BlogEditor() {
   };
   return (
     <>
+      <Toaster />
       <nav className="navbar">
         <Link to="/" className="w-10 flex-none">
           <img src={Logo} alt="Logo" />
@@ -148,7 +144,7 @@ export default function BlogEditor() {
                   type="file"
                   id="uploadBanner"
                   accept=".png, .jpg, .jpeg"
-                  onChange={handleBannerUpload} 
+                  onChange={handleBannerUpload}
                   hidden
                 />
               </label>
@@ -163,7 +159,7 @@ export default function BlogEditor() {
               onKeyDown={handleTitleKeyDown}
               id=""></textarea>
             <hr className="my-10 w-full opacity-40" />
-            
+
             {/* //* text editor */}
             <div id="textEditor" className="font-gelasio"></div>
           </div>
