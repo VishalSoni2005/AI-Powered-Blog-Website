@@ -25,7 +25,7 @@ export default function BlogEditor() {
     setTextEditor(
       new EditorJs({
         holderId: "textEditor",
-        data: "",
+        data: content,
         tools: tools,
         placeholder: "Let's Share Your Story"
       })
@@ -86,18 +86,19 @@ export default function BlogEditor() {
     }
 
     if (textEditor.isReady) {
-      textEditor.save().then((data) => {
-        if (data.blocks.length) {
-          setBlog((prev) => ({ ...prev, content: data }));
-          setEditorState("publish"); 
-        }
-        else {
-          toast.error("Please write something in the editor");
-        }
-      })
-      .catch((error) => {
-        console.error("Saving failed:", error);
-      });
+      textEditor
+        .save()
+        .then((data) => {
+          if (data.blocks.length) {
+            setBlog((prev) => ({ ...prev, content: data }));
+            setEditorState("publish");
+          } else {
+            toast.error("Please write something in the editor");
+          }
+        })
+        .catch((error) => {
+          console.error("Saving failed:", error);
+        });
     }
   };
   return (
@@ -136,7 +137,8 @@ export default function BlogEditor() {
             </div>
 
             <textarea
-              name="description"
+              defaultValue={title}
+              // name="description"
               placeholder="Blog Title"
               className="mt-10 h-20 w-full resize-none font-serif text-4xl font-medium leading-tight outline-none placeholder:opacity-40"
               onChange={handletitleChange}
