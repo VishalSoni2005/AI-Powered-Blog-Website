@@ -3,7 +3,7 @@ import { UserContext } from "../App";
 import { Navigate } from "react-router-dom";
 import BlogEditor from "../components/blog-editor.component";
 import PublishForm from "../components/publish-form.component";
-import { initializeServerApp } from "firebase/app";
+// import { initializeServerApp } from "firebase/app";
 
 const blogStructure = {
   title: "",
@@ -19,16 +19,18 @@ export const EditorContext = createContext({}); //! creating new context for edi
 export default function Editor() {
   const [blog, setBlog] = useState(blogStructure);
   const [editorState, setEditorState] = useState("editor");
-  const [textEditor, setTextEditor] = useState({ isReady: false });
+  const [textEditor, setTextEditor] = useState({ isReady: false }); //*  used to manage the instance of the EditorJs editor and track whether it is ready for use.
+
   let {
     userAuth: { access_token }
   } = useContext(UserContext);
+
   return (
     <EditorContext.Provider
       value={{ blog, setBlog, editorState, setEditorState, textEditor, setTextEditor }}>
       {access_token === null ? (
         <Navigate to="/signin" />
-      ) : editorState == "editor" ? (
+      ) : editorState === "editor" ? (
         <BlogEditor />
       ) : (
         <PublishForm />

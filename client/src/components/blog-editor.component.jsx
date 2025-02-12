@@ -13,24 +13,33 @@ import toast from "react-hot-toast";
 
 export default function BlogEditor() {
   let {
-    blog,
+    blog, //*
     blog: { title, banner, content, tags, des },
     setBlog,
     textEditor,
+    editorState,
     setTextEditor,
     setEditorState
   } = useContext(EditorContext);
 
+
   useEffect(() => {
-    setTextEditor(
-      new EditorJs({
-        holderId: "textEditor",
-        data: content,
-        tools: tools,
-        placeholder: "Let's Share Your Story"
-      })
-    );
+    const editor = new EditorJs({
+      holderId: "textEditor",
+      data: content,
+      tools: tools, // Pass the tools object here
+      placeholder: "Let's Share Your Story"
+    });
+
+    setTextEditor(editor);
+
+    return () => {
+      if (editor) {
+        editor.destroy();
+      }
+    };
   }, []);
+
 
   // todo;
   const handleBannerUpload = async (e) => {
@@ -63,27 +72,31 @@ export default function BlogEditor() {
   };
 
   const handletitleChange = (e) => {
-    console.log(e.target.value);
+    // console.log(e.target.value);
     let input = e.target;
 
     input.style.height = "auto";
     input.style.height = `${input.scrollHeight}px`;
 
     setBlog({ ...blog, title: input.value });
+    console.log("blog -> ", blog); //! debugging
+    console.log("blog title -> ", blog.title); //!
   };
 
   const handlePublishEvent = () => {
     // validate the info
 
-    if (!banner.length) {
-      // tells wheather banner have any image url
-      return toast.error("Please upload a banner image");
-    }
+    // if (!banner.length) {
+    //   // tells wheather banner have any image url
+    //   return toast.error("Please upload a banner image");
+    // }
 
-    if (!title.length) {
-      // tells wheather title
-      return toast.error("Please enter a title");
-    }
+    console.log("public btn, Now Editor State ==> ", editorState);
+
+    // if (!title.length) {
+    //   // tells wheather title
+    //    toast.error("Please enter a title");
+    // }
 
     if (textEditor.isReady) {
       textEditor
@@ -91,7 +104,9 @@ export default function BlogEditor() {
         .then((data) => {
           if (data.blocks.length) {
             setBlog((prev) => ({ ...prev, content: data }));
-            setEditorState("publish");
+            console.log("blog here", blog, "and", data); // debug
+
+            setEditorState("publish"); // Ensure this is called
           } else {
             toast.error("Please write something in the editor");
           }
@@ -100,6 +115,8 @@ export default function BlogEditor() {
           console.error("Saving failed:", error);
         });
     }
+
+    console.log("Now editor State ==>> ", editorState);
   };
   return (
     <>
@@ -123,6 +140,7 @@ export default function BlogEditor() {
       <AnimationWrapper>
         <section>
           <div className="mx-auto w-full max-w-[900px]">
+            {/* //todo: banner div imporve image preview */}
             <div className="border-grey relative aspect-video border-4 bg-white hover:opacity-80">
               <label htmlFor="uploadBanner">
                 <img src={BlogBanner} alt="Blog Banner" className="z-20" />
@@ -130,12 +148,12 @@ export default function BlogEditor() {
                   type="file"
                   id="uploadBanner"
                   accept=".png, .jpg, .jpeg"
-                  onChange={handleBannerUpload} //!edited
+                  onChange={handleBannerUpload} 
                   hidden
                 />
               </label>
             </div>
-
+            {/*  title input field */}
             <textarea
               defaultValue={title}
               // name="description"
@@ -144,9 +162,9 @@ export default function BlogEditor() {
               onChange={handletitleChange}
               onKeyDown={handleTitleKeyDown}
               id=""></textarea>
-
             <hr className="my-10 w-full opacity-40" />
-
+            
+            {/* //* text editor */}
             <div id="textEditor" className="font-gelasio"></div>
           </div>
         </section>
