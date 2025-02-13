@@ -2,10 +2,7 @@ import mongoose from 'mongoose';
 
 const connectDB = async () => {
   try {
-    await mongoose.connect('mongodb://127.0.0.1:27017/Bloging-Website', {
-      useNewUrlParser: true, // Optional in Mongoose 6+
-      useUnifiedTopology: true, // Optional in Mongoose 6+
-    });
+    await mongoose.connect('mongodb://127.0.0.1:27017/Bloging-Website');
 
     console.log('✅ Database Connected Successfully');
   } catch (error) {

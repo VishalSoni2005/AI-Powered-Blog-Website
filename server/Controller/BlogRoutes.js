@@ -1,5 +1,5 @@
-import Blog from "../Schema/Blog";
-import User from "../Schema/User";
+import Blog from "../Schema/Blog.js";
+import User from "../Schema/User.js";
 import { nanoid } from "nanoid";
 
 export const CreateBlog = async (req, res) => {

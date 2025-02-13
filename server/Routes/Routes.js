@@ -16,5 +16,6 @@ router.post("/upload", uploadBanner);
 
 // Create Blog route
 router.post('/create-blog', verifyJWT, CreateBlog);
+// router.post('/create-blog', CreateBlog);
 
 export default router;
