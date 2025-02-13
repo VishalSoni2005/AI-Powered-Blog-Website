@@ -3,11 +3,10 @@ import { UserContext } from "../App";
 import { Navigate } from "react-router-dom";
 import BlogEditor from "../components/blog-editor.component";
 import PublishForm from "../components/publish-form.component";
-// import { initializeServerApp } from "firebase/app";
 
 const blogStructure = {
   title: "",
-  banner: "",
+  banner: "", //todo: it will contain secure url of image
   content: [],
   tags: [],
   des: "",

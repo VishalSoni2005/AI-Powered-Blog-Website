@@ -13,7 +13,7 @@ import { toast, Toaster } from "react-hot-toast";
 
 export default function BlogEditor() {
   let {
-    blog, //*
+    blog,
     blog: { title, banner, content, tags, des },
     setBlog,
     textEditor,
@@ -84,12 +84,9 @@ export default function BlogEditor() {
   const handlePublishEvent = () => {
     // validate the info
 
-    // if (!banner.length) {
-    //   // tells wheather banner have any image url
-    //   return toast.error("Please upload a banner image");
-    // }
-
-    console.log("public btn, Now Editor State ==> ", editorState);
+    if (!banner.length) {
+      return toast.error("Please upload a banner image");
+    }
 
     if (!title.length) {
       toast.error("Please enter a title");
@@ -101,7 +98,7 @@ export default function BlogEditor() {
         .then((data) => {
           if (data.blocks.length) {
             setBlog({ ...blog, content: data });
-            setEditorState("publish"); // Ensure this is called
+            setEditorState("publish"); //* NOTE : Editor state is changing here
           } else {
             toast.error("Please write something in the editor");
           }
