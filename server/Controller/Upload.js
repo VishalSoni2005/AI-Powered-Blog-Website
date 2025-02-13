@@ -38,16 +38,16 @@ export const uploadBanner = async (req, res) => {
     // Upload file to Cloudinary
     const response = await uploadToCloudinary(file, "VishalSoni");
 
-    // console.log("Response:", response.data);
-
     // Return success response
+    console.log("image URL ==>> ", response.data);
+    
     res.status(200).json({
       msg: "File uploaded successfully",
       imageURL: response.secure_url,
       success: true,
     });
   } catch (error) {
-    console.error("Error uploading file:", error);
+    console.error("sorry Error uploading file:", error);
     res.status(500).json({
       msg: "Error uploading file",
       success: false,
