@@ -17,10 +17,6 @@ connectCloudinary();
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use((req, res, next) => {
-    res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
-    next();
-});
 app.use(
     fileUpload({
         useTempFiles: true,
@@ -28,14 +24,51 @@ app.use(
     }),
 ); //* special middleware to upload files
 
-// ✅ Allow CORS for frontend
-app.use(cors({
-  origin: "*", // Allow all origins (Change this to your frontend URL for better security)
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  allowedHeaders: ["Content-Type"],
-}));
-app.use(cors());
-app.use(cors({ origin: 'http://localhost:5173' }));
+
+// Middleware to handle CORS policy. 
+
+
+// ✅ Properly configured CORS (only allow frontend URL)
+app.use(
+  cors({
+    origin: "http://localhost:5173", // Allow frontend running on Vite
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type"],
+    credentials: true, // Allow cookies/auth headers
+  })
+);
+
+// ✅ Set Cross-Origin-Opener-Policy properly
+// app.use((req, res, next) => {
+//   res.setHeader("Cross-Origin-Opener-Policy", "same-origin"); // Adjust as needed
+//   res.setHeader("Cross-Origin-Embedder-Policy", "require-corp");
+//   next();
+// });
+
+app.use((req, res, next) => {
+  res.setHeader("Cross-Origin-Opener-Policy", "unsafe-none");
+  res.setHeader("Cross-Origin-Embedder-Policy", "credentialless");
+  next();
+});
+
+// app.use((req, res, next) => {
+//     // res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+//     res.setHeader("Cross-Origin-Opener-Policy", "unsafe-none");
+//     next();
+// });
+
+// // ✅ Allow CORS for frontend
+// app.use(cors({
+//   origin: "*",
+//   methods: ["GET", "POST", "PUT", "DELETE"],
+//   allowedHeaders: ["Content-Type"],
+// }));
+// app.use(cors());
+// app.use(cors({ origin: 'http://localhost:5173' }));
+
+
+
+
 
 // routes
 app.use('/', routes);

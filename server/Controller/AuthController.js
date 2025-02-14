@@ -49,17 +49,18 @@ export const signup = async (req, res) => {
       return res.status(400).json({ success: false, message: "Please fill all the fields" });
     }
 
-    if (!emailRegex.test(email)) {
-      return res.status(400).json({ success: false, message: "Invalid email format" });
-    }
+    // todo
+    // if (!emailRegex.test(email)) {
+    //   return res.status(400).json({ success: false, message: "Invalid email format" });
+    // }
 
-    if (!passwordRegex.test(password)) {
-      return res.status(400).json({
-        success: false,
-        message:
-          "Password must be at least 6 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*?&).",
-      });
-    }
+    // if (!passwordRegex.test(password)) {
+    //   return res.status(400).json({
+    //     success: false,
+    //     message:
+    //       "Password must be at least 6 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*?&).",
+    //   });
+    // }
 
     // Check if user already exists
     const existingUser = await User.findOne({ "personal_info.email": email });
