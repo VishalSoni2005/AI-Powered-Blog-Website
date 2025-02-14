@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import { EditorContext } from "../pages/editor.pages";
 
 export default function Tags({ tag, tagIndex}) {
-  const {
+  let {
     blog,
     blog: { tags },
     setBlog
