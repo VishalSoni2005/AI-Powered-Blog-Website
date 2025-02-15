@@ -19,13 +19,12 @@ export default function AuthForm({ type }) {
 
   console.log("Access Token is ===>> ", access_token);
 
-  //! cousing error 
+  //! cousing error
   const userAuthThroughServer = async (route, data) => {
     try {
       const response = await axios.post(`http://localhost:3000${route}`, data);
 
       console.log("Request made");
-      
 
       const userData = response.data;
       storeInSession("user", JSON.stringify(userData));
@@ -84,8 +83,8 @@ export default function AuthForm({ type }) {
         let formData = {
           access_token: user.access_token
         };
-
         userAuthThroughServer(serverRoute, formData);
+        console.log("User from google auth => ", user);
       })
       .catch((err) => {
         console.error("Error from authform at handle google auth => ", err);
