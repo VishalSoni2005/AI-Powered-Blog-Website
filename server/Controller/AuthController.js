@@ -10,18 +10,21 @@ import { getAuth } from "firebase-admin/auth";
 import serviceAccountKey from "../../../blog-website-001-firebase-adminsdk-fbsvc-1cbf77c0ff.json" assert { type: "json" };
 
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccountKey),
+  credential: admin.credential.cert(serviceAccountKey)
 });
 
 // Regex validations
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
+const passwordRegex =
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
 
 // Unique username generator
-const generateUsername = async email => {
+const generateUsername = async (email) => {
   let username = email.split("@")[0];
 
-  let isUsernameUnique = await User.exists({ "personal_info.username": username });
+  let isUsernameUnique = await User.exists({
+    "personal_info.username": username
+  });
   if (isUsernameUnique) {
     username += nanoid(3);
   }
@@ -30,13 +33,15 @@ const generateUsername = async email => {
 };
 
 // Format data to send
-const formatDataToSend = user => {
-  const access_token = jwt.sign({ id: user._id }, process.env.SECRET_KEY, { expiresIn: "1d" }); //* create access token
+const formatDataToSend = (user) => {
+  const access_token = jwt.sign({ id: user._id }, process.env.SECRET_KEY, {
+    expiresIn: "1d"
+  }); //* create access token
   return {
     access_token,
     profile_img: user.personal_info.profile_img,
     fullname: user.personal_info.fullname,
-    username: user.personal_info.username,
+    username: user.personal_info.username
   };
 };
 
@@ -46,7 +51,9 @@ export const signup = async (req, res) => {
 
     // Validate input fields
     if (!fullname || !email || !password) {
-      return res.status(400).json({ success: false, message: "Please fill all the fields" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Please fill all the fields" });
     }
 
     // todo
@@ -65,7 +72,9 @@ export const signup = async (req, res) => {
     // Check if user already exists
     const existingUser = await User.findOne({ "personal_info.email": email });
     if (existingUser) {
-      return res.status(400).json({ success: false, message: "Email already in use." });
+      return res
+        .status(400)
+        .json({ success: false, message: "Email already in use." });
     }
 
     // Hash the password
@@ -77,7 +86,12 @@ export const signup = async (req, res) => {
 
     // Create user
     const newUser = new User({
-      personal_info: { fullname: fullname, password: hashedPassword, email, username },
+      personal_info: {
+        fullname: fullname,
+        password: hashedPassword,
+        email,
+        username
+      }
     });
 
     await newUser.save();
@@ -85,7 +99,10 @@ export const signup = async (req, res) => {
     res.status(201).json(formatDataToSend(newUser));
   } catch (error) {
     console.error(error);
-    res.status(500).json({ success: false, message: "Server Error, Unable to process request" });
+    res.status(500).json({
+      success: false,
+      message: "Server Error, Unable to process request"
+    });
   }
 };
 
@@ -93,81 +110,117 @@ export const signin = async (req, res) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) {
-      return res.status(400).json({ success: false, message: "Please fill all the fields" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Please fill all the fields" });
     }
     if (!emailRegex.test(email)) {
-      return res.status(400).json({ success: false, message: "Invalid email format" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid email format" });
     }
     if (!passwordRegex.test(password)) {
       return res.status(400).json({
         success: false,
         message:
-          "Password must be at least 6 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*?&).",
+          "Password must be at least 6 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*?&)."
       });
     }
     const user = await User.findOne({ "personal_info.email": email });
     if (!user) {
-      return res.status(404).json({ success: false, message: "User not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     }
-    const isPasswordValid = await bcrypt.compare(password, user.personal_info.password);
-    if (!isPasswordValid) {
-      return res.status(401).json({ success: false, message: "Invalid credentials" });
+
+    if(!user.google_auth) {
+      const isPasswordValid = await bcrypt.compare(
+        password,
+        user.personal_info.password
+      );
+      if (!isPasswordValid) {
+        return res
+          .status(401)
+          .json({ success: false, message: "Invalid credentials" });
+      }
+      res.json(formatDataToSend(user));
+
+    } else {
+      return res.status(403).json({
+        success: false,
+        message: "User already registered with Google"
+      });
     }
-    res.json(formatDataToSend(user));
   } catch (error) {
     console.error(error);
-    res.status(500).json({ success: false, message: "Server Error, Unable to process request" });
+    res.status(500).json({
+      success: false,
+      message: "Server Error, Unable to process request"
+    });
   }
 };
 
 export const googleAuth = async (req, res) => {
-  try {
-    const { access_token } = req.body;
+  let { access_token } = req.body;
 
-    if (!access_token) {
-      return res.status(400).json({ success: false, message: "Access token is required" });
-    }
+  getAuth()
+    .verifyIdToken(access_token)
+    .then(async (decodedUser) => {
+      let { email, name, picture } = decodedUser;
 
-    const decodedToken = await getAuth().verifyIdToken(access_token);
-    let { email, name, picture: image } = decodedToken;
+      picture = picture.replace("s96-c", "s384-c");
 
-    // Ensure high-resolution profile image
-    if (image) {
-      image = image.replace("s96-c", "s384-c");
-    }
-
-    let existingUser = await User.findOne({ "personal_info.email": email }).select(
-      "personal_info.fullname personal_info.username personal_info.profile_img google_auth"
-    );
-
-    if (existingUser) {
-      if (!existingUser.google_auth) {
-        return res.status(403).json({
-          success: false,
-          message:
-            "User is already registered with a different authentication method. Please try again.",
+      let user = await User.findOne({ "personal_info.email": email })
+        .select(
+          "personal_info.fullname personal_info.username personal_info.profile_img google_auth"
+        )
+        .then((u) => {
+          return u || null;
+        })
+        .catch((err) => {
+          return res.status(500).json({
+            note: "Error in server google_auth controller : " + err.message,
+            message: "Server Error, Unable to process request"
+          });
         });
+      if (user) {
+        if (!user.google_auth) {
+          return res.status(403).json({
+            note: "User already registered with a different method",
+            message: "User already registered with a different method"
+          });
+        }
+      } else {
+        let username = await generateUsername(email);
+        user = new User({
+          personal_info: {
+            fullname: name,
+            email,
+            username
+          },
+          google_auth: true
+        });
+
+        await user
+          .save()
+          .then((u) => {
+            user = u;
+          })
+          .catch((err) => {
+            return res.status(500).json({
+              note:
+                "Error in server google_auth controller {1} : " + err.message,
+              message: "Server Error, Unable to process request"
+            });
+          });
+
+        return res.status(200).json(formatDataToSend(user));
       }
-    } else {
-      const username = await generateUsername(email); // Ensure uniqueness
-
-      const newUser = new User({
-        personal_info: {
-          fullname: name,
-          email,
-          username,
-          google_auth: true,
-        },
+    })
+    .catch((err) => {
+      return res.status(500).json({
+        note: "Error in server google_auth controller {2} : " + err.message,
+        message: "Server Error, Unable to process request"
       });
-
-      existingUser = await newUser.save();
-    }
-
-    return res.status(200).json(formatDataToSend(existingUser));
-  } catch (error) {
-    console.error("Error in Google Authentication:", error);
-    return res
-      .status(500)
-      .json({ success: false, message: "Server Error, Unable to process request" });
-  }
+    });
 };
