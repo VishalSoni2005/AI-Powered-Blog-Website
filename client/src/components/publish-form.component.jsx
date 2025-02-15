@@ -3,6 +3,9 @@ import AnimationWrapper from "../common/page-animation";
 import toast, { ToastBar, Toaster } from "react-hot-toast";
 import { EditorContext } from "../pages/editor.pages";
 import Tags from "./tags.component";
+import axios from "axios";
+import { UserContext } from "../App";
+import { useNavigate } from "react-router-dom";
 
 export default function PublishForm() {
   let charLimit = 200;
@@ -13,6 +16,12 @@ export default function PublishForm() {
     setEditorState,
     setBlog
   } = useContext(EditorContext);
+
+  let navigate = useNavigate();
+
+  let {
+    userAuth: { access_token }
+  } = useContext(UserContext);
 
   const handleClick = () => {
     setEditorState("editor");
@@ -51,6 +60,61 @@ export default function PublishForm() {
     }
   };
 
+  const publishBlog = (e) => {
+
+    if(e.target.className.includes("disable")) {
+      return;
+    }
+
+    if (!title.length) {
+      toast.error("Please enter a title");
+      return;
+    }
+
+    if (!des.length || des.length > charLimit) {
+      toast.error(`Description must be at least ${charLimit} characters long`);
+      return;
+    }
+
+    if (!tags.length || tags.length > tagLimit) {
+      toast.error("Please add at Tag");
+      return;
+    }
+
+    let loadingToast = toast.loading("Publishing...");
+
+    e.target.classList.add("disable");
+    let blogObject = {
+      title,
+      content,
+      des,
+      tags,
+      banner,
+      draft: false
+    };
+
+    axios.post("http://localhost:3000/create-blog", blogObject, {
+      headers: {
+        // "Content-Type": "application/json",
+        Authorization: `Bearer ${access_token}`
+      }
+    })
+     .then((res) => {
+      e.target.classList.remove("disable");
+       toast.dismiss(loadingToast);
+       toast.success("Blog published successfully");
+       
+       setTimeout( () => {
+         navigate(`/`);
+       }, 500);
+     })
+     .catch( ( { response }) => {
+       e.target.classList.remove("disable");
+       toast.dismiss(loadingToast);
+       toast.error(response.data.msg);
+       toast.error(response.data.error);
+     }) 
+  };
   return (
     <AnimationWrapper>
       <section className="grid min-h-screen w-screen items-center py-16 lg:grid-cols-2 lg:gap-4">
@@ -106,13 +170,14 @@ export default function PublishForm() {
             {tags.map((tag, i) => {
               <Tags tag={tag} key={i} tagIndex={i} />;
             })}
-
           </div>
-            <p className="text-dark-grey mt-1 mb-4 text-right text-sm">
-              {tagLimit - tags.length} Tags left
-            </p>
+          <p className="text-dark-grey mb-4 mt-1 text-right text-sm">
+            {tagLimit - tags.length} Tags left
+          </p>
 
-            <button className="btn-dark px-8">Publish</button>
+          <button onClick={publishBlog} className="btn-dark px-8">
+            Publish
+          </button>
         </div>
       </section>
     </AnimationWrapper>

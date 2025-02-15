@@ -63,13 +63,13 @@ export default function AuthForm({ type }) {
     }
 
     //todo
-    // if (!emailRegex.test(email)) {
-    //   return toast.error("Invalid email format");
-    // }
+    if (!emailRegex.test(email)) {
+      return toast.error("Invalid email format");
+    }
 
-    // if (!passwordRegex.test(password)) {
-    //   return toast.error("Invalid password format");
-    // }
+    if (!passwordRegex.test(password)) {
+      return toast.error("Invalid password format");
+    }
 
     // authThroughServer
     userAuthThroughServer(serverRoute, formData);

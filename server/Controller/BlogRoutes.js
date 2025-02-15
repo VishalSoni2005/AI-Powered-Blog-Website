@@ -9,36 +9,43 @@ export const CreateBlog = async (req, res) => {
     const authId = req.user;
     const { title, des, tags, banner, content, draft } = req.body;
 
-    if (!title || !des) {
+    if(!title) {
       return res.status(400).json({
         message: "Bad Request",
-        note: "Please fill all the fields"
+        note: "Title is required"
       });
     }
-    if (!banner.length) {
-      return res.status(400).json({
-        message: "Bad Request",
-        note: "Please upload a banner image"
-      });
-    }
+    if (!draft) {
+      if (!title || !des) {
+        return res.status(400).json({
+          message: "Bad Request",
+          note: "Please fill all the fields"
+        });
+      }
+      if (!banner.length) {
+        return res.status(400).json({
+          message: "Bad Request",
+          note: "Please upload a banner image"
+        });
+      }
 
-    //* content is object generated from editorjs.
-    //* content object contain block array
-    if (!content.blocks.length) {
-      //!error expected
-      return res.status(400).json({
-        message: "Bad Request",
-        note: "Please write some content"
-      });
-    }
+      //* content is object generated from editorjs.
+      //* content object contain block array
+      if (!content.blocks.length) {
+        //!error expected
+        return res.status(400).json({
+          message: "Bad Request",
+          note: "Please write some content"
+        });
+      }
 
-    if (!tags.length) {
-      return res.status(400).json({
-        message: "Bad Request",
-        note: "Please add tags"
-      });
+      if (!tags.length) {
+        return res.status(400).json({
+          message: "Bad Request",
+          note: "Please add tags"
+        });
+      }
     }
-
     //* lowercasing all tags
     tags = tags.map((i) => i.toLowerCase());
 
