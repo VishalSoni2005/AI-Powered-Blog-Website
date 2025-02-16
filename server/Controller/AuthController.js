@@ -9,6 +9,7 @@ import admin from "firebase-admin";
 import { getAuth } from "firebase-admin/auth";
 import serviceAccountKey from "../../../blog-website-001-firebase-adminsdk-fbsvc-1cbf77c0ff.json" assert { type: "json" };
 
+
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccountKey)
 });
@@ -31,6 +32,8 @@ const generateUsername = async (email) => {
 
   return username;
 };
+
+// eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3YjFkNjhhM2JiMjFiZDk4MzBhMWEzYiIsImlhdCI6MTczOTcwODA0MiwiZXhwIjoxNzM5Nzk0NDQyfQ.uwFXDX2nHqp6zTIjDij7oOqWkdW9zDZwBHgOibtM9wI;
 
 // Format data to send
 const formatDataToSend = (user) => {
@@ -160,67 +163,128 @@ export const signin = async (req, res) => {
   }
 };
 
+// export const googleAuth = async (req, res) => {
+//   let { access_token } = req.body;
+
+//   getAuth()
+//     .verifyIdToken(access_token)
+//     .then(async (decodedUser) => {
+//       let { email, name, picture } = decodedUser;
+
+//       picture = picture.replace("s96-c", "s384-c");
+
+//       let user = await User.findOne({ "personal_info.email": email })
+//         .select(
+//           "personal_info.fullname personal_info.username personal_info.profile_img google_auth"
+//         )
+//         .then((u) => {
+//           return u || null;
+//         })
+//         .catch((err) => {
+//           return res.status(500).json({
+//             note: "Error in server google_auth controller : " + err.message,
+//             message: "Server Error, Unable to process request"
+//           });
+//         });
+//       if (user) {
+//         if (!user.google_auth) {
+//           return res.status(403).json({
+//             note: "User already registered with a different method",
+//             message: "User already registered with a different method"
+//           });
+//         }
+//       } else {
+//         let username = await generateUsername(email);
+//         user = new User({
+//           personal_info: {
+//             fullname: name,
+//             email,
+//             username
+//           },
+//           google_auth: true
+//         });
+
+//         await user
+//           .save()
+//           .then((u) => {
+//             user = u;
+//           })
+//           .catch((err) => {
+//             return res.status(500).json({
+//               note:
+//                 "Error in server google_auth controller {1} : " + err.message,
+//               message: "Server Error, Unable to process request"
+//             });
+//           });
+
+//         return res.status(200).json(formatDataToSend(user));
+//       }
+//     })
+//     .catch((err) => {
+//       return res.status(500).json({
+//         note: "Error in server google_auth controller {2} : " + err.message,
+//         message: "Server Error, Unable to process request"
+//       });
+//     });
+// };
+
+
 export const googleAuth = async (req, res) => {
-  let { access_token } = req.body;
+  try {
+    let { access_token } = req.body;
+    const decodedUser = await getAuth().verifyIdToken(access_token);
+    let { email, name, picture } = decodedUser;
 
-  getAuth()
-    .verifyIdToken(access_token)
-    .then(async (decodedUser) => {
-      let { email, name, picture } = decodedUser;
+    picture = picture.replace("s96-c", "s384-c");
 
-      picture = picture.replace("s96-c", "s384-c");
-
-      let user = await User.findOne({ "personal_info.email": email })
-        .select(
-          "personal_info.fullname personal_info.username personal_info.profile_img google_auth"
-        )
-        .then((u) => {
-          return u || null;
-        })
-        .catch((err) => {
-          return res.status(500).json({
-            note: "Error in server google_auth controller : " + err.message,
-            message: "Server Error, Unable to process request"
-          });
-        });
-      if (user) {
-        if (!user.google_auth) {
-          return res.status(403).json({
-            note: "User already registered with a different method",
-            message: "User already registered with a different method"
-          });
-        }
-      } else {
-        let username = await generateUsername(email);
-        user = new User({
-          personal_info: {
-            fullname: name,
-            email,
-            username
-          },
-          google_auth: true
-        });
-
-        await user
-          .save()
-          .then((u) => {
-            user = u;
-          })
-          .catch((err) => {
-            return res.status(500).json({
-              note:
-                "Error in server google_auth controller {1} : " + err.message,
-              message: "Server Error, Unable to process request"
-            });
-          });
-
-        return res.status(200).json(formatDataToSend(user));
-      }
-    })
-    .catch((err) => {
+    let user;
+    try {
+      user = await User.findOne({ "personal_info.email": email }).select(
+        "personal_info.fullname personal_info.username personal_info.profile_img google_auth"
+      );
+    } catch (err) {
       return res.status(500).json({
-        note: "Error in server google_auth controller {2} : " + err.message,
+        note: "Error in server google_auth controller: " + err.message,
         message: "Server Error, Unable to process request"
       });
+    }
+
+    if (user) {
+      if (!user.google_auth) {
+        return res.status(403).json({
+          note: "User already registered with a different method",
+          message: "User already registered with a different method"
+        });
+      }
+      return res.status(200).json(formatDataToSend(user));
+    }
+
+    // If user does not exist, create a new one
+    let username = await generateUsername(email);
+    user = new User({
+      personal_info: {
+        fullname: name,
+        email,
+        username,
+        profile_img: picture
+      },
+      google_auth: true
     });
+
+    try {
+      await user.save();
+    } catch (err) {
+      return res.status(500).json({
+        note: "Error in saving user: " + err.message,
+        message: "Server Error, Unable to process request"
+      });
+    }
+
+    return res.status(200).json(formatDataToSend(user));
+  } catch (err) {
+    return res.status(401).json({
+      note: "Invalid Google access token",
+      message: "Unauthorized access"
+    });
+  }
 };

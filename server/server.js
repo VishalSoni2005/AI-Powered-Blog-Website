@@ -25,7 +25,6 @@ app.use(
 ); //* special middleware to upload files
 
 // Middleware to handle CORS policy.
-
 // ✅ Properly configured CORS (only allow frontend URL)
 app.use(cors());
 app.use(cors({ origin: "http://localhost:5173" }));
