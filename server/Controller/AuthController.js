@@ -231,6 +231,7 @@ export const signin = async (req, res) => {
 
 export const googleAuth = async (req, res) => {
   try {
+    
     let { access_token } = req.body;
     const decodedUser = await getAuth().verifyIdToken(access_token);
     let { email, name, picture } = decodedUser;
