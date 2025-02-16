@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Logo from "../imgs/logo.png";
 import BlogBanner from "../imgs/blog banner.png";
@@ -8,15 +8,15 @@ import { tools } from "./tools.component";
 import { EditorContext } from "../pages/editor.pages";
 import axios from "axios";
 import { toast, Toaster } from "react-hot-toast";
-import axios from "axios";
 import { UserContext } from "../App";
 
 // import { uploadToCloudinary } from "../common/cloudinary";
 
 export default function BlogEditor() {
-  let {
-    userAuth: { access_token }
-  } = useContext(UserContext);
+  let { userAuth: { access_token } } = useContext(UserContext);
+
+
+  let blogBannerRef = useRef();
   let {
     blog,
     blog: { title, banner, content, tags, des },
@@ -64,10 +64,17 @@ export default function BlogEditor() {
       const response = await axios.post("http://localhost:3000/upload", formData);
 
       const data = await response.data;
-      console.log("Uploaded Image URL:", data.secure_url);
+      console.log("Uploaded Image Data:", data);
+      
+      let imgUrl = data.url;
+      console.log("Uploaded Image URL +=>> ", imgUrl);
+
+      if(imgUrl) {
+        blogBannerRef.current.src = imgUrl;
+      }
 
       // Update the blog banner URL in state
-      setBlog((prev) => ({ ...prev, banner: data.secure_url }));
+      setBlog((prev) => ({ ...prev, banner: data.url }));
     } catch (error) {
       console.error("Upload failed:", error);
     }
@@ -87,8 +94,8 @@ export default function BlogEditor() {
     input.style.height = `${input.scrollHeight}px`;
 
     setBlog({ ...blog, title: input.value });
-    console.log("blog -> ", blog); //! debugging
-    console.log("blog title -> ", blog.title); //!
+    // console.log("blog -> ", blog); //! debugging
+    // console.log("blog title -> ", blog.title); //!
   };
 
   const handlePublishEvent = () => {
@@ -196,9 +203,16 @@ export default function BlogEditor() {
         <section>
           <div className="mx-auto w-full max-w-[900px]">
             {/* //todo: banner div imporve image preview */}
+
+
             <div className="border-grey relative aspect-video border-4 bg-white hover:opacity-80">
               <label htmlFor="uploadBanner">
-                <img src={BlogBanner} alt="Blog Banner" className="z-20" />
+                <img
+                  className="w-full h-full object-contain z-20 "
+                  ref={blogBannerRef}
+                src={BlogBanner} alt="Blog Banner" 
+                // className="z-20" //todo: classname modified
+                 />
                 <input
                   type="file"
                   id="uploadBanner"
@@ -208,6 +222,8 @@ export default function BlogEditor() {
                 />
               </label>
             </div>
+
+
             {/*  title input field */}
             <textarea
               defaultValue={title}

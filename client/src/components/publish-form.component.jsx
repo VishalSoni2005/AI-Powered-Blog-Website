@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import AnimationWrapper from "../common/page-animation";
-import toast, { ToastBar, Toaster } from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 import { EditorContext } from "../pages/editor.pages";
 import Tags from "./tags.component";
 import axios from "axios";
