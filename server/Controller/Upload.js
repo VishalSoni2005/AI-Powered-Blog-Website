@@ -39,11 +39,13 @@ export const uploadBanner = async (req, res) => {
     const response = await uploadToCloudinary(file, "VishalSoni");
 
     // Return success response
-    console.log("image URL ==>> ", response.data);
+    console.log("image URL ==>> ", response);
+    console.log(response.url);
+    
     
     res.status(200).json({
       msg: "File uploaded successfully",
-      imageURL: response.secure_url,
+      url: response.url,
       success: true,
     });
   } catch (error) {
