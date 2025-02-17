@@ -9,7 +9,7 @@ export const CreateBlog = async (req, res) => {
     const authId = req.user;
     const { title, des, tags, banner, content, draft } = req.body;
 
-    if(!title) {
+    if (!title) {
       return res.status(400).json({
         message: "Bad Request",
         note: "Title is required"
