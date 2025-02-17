@@ -10,11 +10,8 @@ import axios from "axios";
 import { toast, Toaster } from "react-hot-toast";
 import { UserContext } from "../App";
 
-// import { uploadToCloudinary } from "../common/cloudinary";
-
 export default function BlogEditor() {
   let { userAuth: { access_token } } = useContext(UserContext);
-
 
   let blogBannerRef = useRef();
   let {
@@ -65,11 +62,11 @@ export default function BlogEditor() {
 
       const data = await response.data;
       console.log("Uploaded Image Data:", data);
-      
+
       let imgUrl = data.url;
       console.log("Uploaded Image URL +=>> ", imgUrl);
 
-      if(imgUrl) {
+      if (imgUrl) {
         blogBannerRef.current.src = imgUrl;
       }
 
@@ -210,9 +207,9 @@ export default function BlogEditor() {
                 <img
                   className="w-full h-full object-contain z-20 "
                   ref={blogBannerRef}
-                src={BlogBanner} alt="Blog Banner" 
+                  src={BlogBanner} alt="Blog Banner"
                 // className="z-20" //todo: classname modified
-                 />
+                />
                 <input
                   type="file"
                   id="uploadBanner"

@@ -2,9 +2,9 @@ import React, { useContext } from "react";
 import AnimationWrapper from "../common/page-animation";
 import toast, { Toaster } from "react-hot-toast";
 import { EditorContext } from "../pages/editor.pages";
+import { UserContext } from "../App";
 import Tags from "./tags.component";
 import axios from "axios";
-import { UserContext } from "../App";
 import { useNavigate } from "react-router-dom";
 
 export default function PublishForm() {
@@ -19,9 +19,7 @@ export default function PublishForm() {
 
   let navigate = useNavigate();
 
-  let {
-    userAuth: { access_token }
-  } = useContext(UserContext);
+  let { userAuth: { access_token } } = useContext(UserContext);
 
   const handleClick = () => {
     setEditorState("editor");
@@ -62,7 +60,7 @@ export default function PublishForm() {
 
   const publishBlog = (e) => {
 
-    if(e.target.className.includes("disable")) {
+    if (e.target.className.includes("disable")) {
       return;
     }
 
@@ -99,21 +97,21 @@ export default function PublishForm() {
         Authorization: `Bearer ${access_token}`
       }
     })
-     .then((res) => {
-      e.target.classList.remove("disable");
-       toast.dismiss(loadingToast);
-       toast.success("Blog published successfully");
-       
-       setTimeout( () => {
-         navigate(`/`);
-       }, 500);
-     })
-     .catch( ( { response }) => {
-       e.target.classList.remove("disable");
-       toast.dismiss(loadingToast);
-       toast.error(response.data.msg);
-       toast.error(response.data.error);
-     }) 
+      .then((res) => {
+        e.target.classList.remove("disable");
+        toast.dismiss(loadingToast);
+        toast.success("Blog published successfully");
+
+        setTimeout(() => {
+          navigate(`/`);
+        }, 500);
+      })
+      .catch(({ response }) => {
+        e.target.classList.remove("disable");
+        toast.dismiss(loadingToast);
+        toast.error(response.data.msg);
+        toast.error(response.data.error);
+      })
   };
   return (
     <AnimationWrapper>

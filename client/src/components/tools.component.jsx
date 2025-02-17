@@ -14,6 +14,7 @@ import Warning from "@editorjs/warning"; // Added Warning tool
 import Underline from "@editorjs/underline"; // Added Underline tool
 
 // Function to handle image upload by URL
+//* custom uploader function
 const uploadImageByUrl = async (url) => {
   try {
     return {
@@ -30,23 +31,22 @@ const uploadImageByUrl = async (url) => {
 };
 
 // Function to handle image upload by file
+//* this function is to upload file in editor section
 const uploadImageByFile = async (file) => {
   try {
-    // Example: Upload file to a server or cloud storage (e.g., Cloudinary, AWS S3)
-    // const formData = new FormData();
-    // formData.append("file", file);
-    // const response = await axios.post("https://your-upload-endpoint.com/upload", formData);
-    // const imageUrl = response.data.url;
+    const formData = new FormData();
+    formData.append("file", file);
+    const response = await axios.post("http://localhost:3000/upload", formData);
+    const imageUrl = response.data.url;
 
-    // For now, return a mock URL
-    const mockUrl = URL.createObjectURL(file);
     return {
       success: 1,
-      file: { url: mockUrl }
+      file: { url: imageUrl }
     };
   } catch (err) {
     console.error("Error uploading image by file:", err);
     return {
+      note: "Error uploading image by file in editor from tools.components section",
       success: 0,
       error: "Failed to upload image by file"
     };
@@ -55,7 +55,6 @@ const uploadImageByFile = async (file) => {
 
 // Export the tools configuration
 export const tools = {
-  // Image tool with uploader configuration
   image: {
     class: Image,
     config: {
@@ -66,10 +65,8 @@ export const tools = {
     }
   },
 
-  // Embed tool for embedding external content (e.g., YouTube, Twitter)
   embed: Embed,
 
-  // Header tool with customizable levels and placeholder
   header: {
     class: Header,
     inlineToolbar: true,
@@ -79,16 +76,14 @@ export const tools = {
     }
   },
 
-  // List tool with bullet or numbered list options
   list: {
     class: List,
     inlineToolbar: true,
     config: {
-      defaultStyle: "unordered" // or "ordered"
+      defaultStyle: "unordered"
     }
   },
 
-  // Quote tool for block quotes
   quote: {
     class: Quote,
     inlineToolbar: true,
@@ -98,16 +93,13 @@ export const tools = {
     }
   },
 
-  // Marker tool for highlighting text
   marker: {
     class: Marker,
     inlineToolbar: true
   },
 
-  // InlineCode tool for inline code snippets
   inlineCode: InlineCode,
 
-  // Code tool for code blocks with syntax highlighting
   code: {
     class: CodeTool,
     config: {
@@ -115,7 +107,6 @@ export const tools = {
     }
   },
 
-  // Table tool for creating tables
   table: {
     class: Table,
     inlineToolbar: true,
@@ -125,24 +116,21 @@ export const tools = {
     }
   },
 
-  // Link tool for adding hyperlinks
+  //todo: configure link 
   link: {
     class: LinkTool,
     config: {
-      endpoint: "https://your-backend.com/fetch-url" // Endpoint to fetch link metadata
+      endpoint: "https://your-backend.com/fetch-url"
     }
   },
 
-  // Checklist tool for to-do lists
   checklist: {
     class: Checklist,
     inlineToolbar: true
   },
 
-  // Delimiter tool for adding a horizontal line
   delimiter: Delimiter,
 
-  // Warning tool for adding warning blocks
   warning: {
     class: Warning,
     inlineToolbar: true,
@@ -152,7 +140,6 @@ export const tools = {
     }
   },
 
-  // Underline tool for underlining text
   underline: Underline
 };
 

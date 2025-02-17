@@ -14,14 +14,14 @@ export default function InPageNavigation({
     let { offsetWidth, offsetLeft } = btn;
 
     activeTabLineRef.current.style.width = offsetWidth + "px";
-    activeTabLineRef.current.style.width = offsetLeft + "px";
+    activeTabLineRef.current.style.left = offsetLeft + "px";
 
     setInPageNavIdx(i);
   };
 
   useEffect(() => {
     changePageState(activeTabRef.current, defaultActiveIdx);
-  }, []);
+  }, [defaultActiveIdx]);
   return (
     <>
       <div className="border-grey relative mb-8 flex flex-nowrap overflow-x-auto border-b bg-white">
