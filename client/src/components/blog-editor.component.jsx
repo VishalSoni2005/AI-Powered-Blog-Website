@@ -122,58 +122,112 @@ export default function BlogEditor() {
         });
     }
 
-    console.log("Now editor State ==>> ", editorState);
+    // console.log("Now editor State ==>> ", editorState);
   };
 
-  const handleSaveDraft = (e) => {
+  const handleSaveDraft = async (e) => {
     if (e.target.className.includes("disable")) {
       return;
     }
-    if (!title.length) {
-      toast.error("Please enter a title Before saving");
+
+    if (!title.trim()) {
+      toast.error("Please enter a title before saving");
       return;
     }
 
     let loadingToast = toast.loading("Saving Draft...");
-
     e.target.classList.add("disable");
 
-    if (textEditor.isReady) {
-      textEditor.save().then((content) => {
-        let blogObject = {
-          title,
-          content,
-          des,
-          tags,
-          banner,
-          draft: true
-        };
+    if (!textEditor || !textEditor.isReady) {
+      toast.dismiss(loadingToast);
+      toast.error("Editor is not ready");
+      e.target.classList.remove("disable");
+      return;
+    }
 
-        axios
-          .post("http://localhost:3000/create-blog", blogObject, {
-            headers: {
-              // "Content-Type": "application/json",
-              Authorization: `Bearer ${access_token}`
-            }
-          })
-          .then((res) => {
-            e.target.classList.remove("disable");
-            toast.dismiss(loadingToast);
-            toast.success("Blog saved successfully");
+    try {
+      const content = await textEditor.save();
 
-            setTimeout(() => {
-              navigate(`/`);
-            }, 500);
-          })
-          .catch(({ response }) => {
-            e.target.classList.remove("disable");
-            toast.dismiss(loadingToast);
-            toast.error(response.data.msg);
-            toast.error(response.data.error);
-          });
+      let blogObject = {
+        title,
+        content,
+        des,
+        tags,
+        banner,
+        draft: true,
+      };
+
+      await axios.post("http://localhost:3000/create-blog", blogObject, {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
       });
+
+      toast.dismiss(loadingToast);
+      toast.success("Blog saved successfully");
+
+      setTimeout(() => {
+        navigate(`/`);
+      }, 500);
+    } catch (error) {
+      e.target.classList.remove("disable");
+      toast.dismiss(loadingToast);
+      toast.error(error.response?.data?.msg || "Something went wrong");
+      toast.error(error.response?.data?.error || "Unknown error occurred");
     }
   };
+
+
+
+  // const handleSaveDraft = (e) => {
+  //   if (e.target.className.includes("disable")) {
+  //     return;
+  //   }
+  //   if (!title.length) {
+  //     toast.error("Please enter a title Before saving");
+  //     return;
+  //   }
+
+  //   let loadingToast = toast.loading("Saving Draft...");
+
+  //   e.target.classList.add("disable");
+
+  //   if (textEditor.isReady) {
+  //     textEditor.save().then((content) => {
+  //       let blogObject = {
+  //         title,
+  //         content, //todo: err
+  //         des,
+  //         tags,
+  //         banner,
+  //         draft: true
+  //       };
+
+  //       axios
+  //         .post("http://localhost:3000/create-blog", blogObject, {
+  //           headers: {
+  //             // "Content-Type": "application/json",
+  //             Authorization: `Bearer ${access_token}`
+  //           }
+  //         })
+  //         .then((res) => {
+  //           e.target.classList.remove("disable");
+  //           toast.dismiss(loadingToast);
+  //           toast.success("Blog saved successfully");
+
+  //           setTimeout(() => {
+  //             navigate(`/`);
+  //           }, 500);
+  //         })
+  //         .catch(({ response }) => {
+  //           e.target.classList.remove("disable");
+  //           toast.dismiss(loadingToast);
+  //           toast.error(response.data.msg);
+  //           toast.error(response.data.error);
+  //         });
+  //     });
+  //   }
+  // };
   return (
     <>
       <Toaster />

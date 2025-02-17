@@ -19,33 +19,13 @@ export default function AuthForm({ type }) {
 
   console.log("Access Token is ===>> ", access_token);
 
-  //! cousing error
-  // const userAuthThroughServer = async (route, data) => {
-  //   try {
-  //     const response = await axios.post(`http://localhost:3000${route}`, data);
-
-  //     console.log("Request made");
-
-  //     const userData = response.data;
-  //     storeInSession("user", JSON.stringify(userData));
-  //     setUserAuth(userData);
-
-  //     // Show success notification
-  //     toast.success("Authentication successful");
-  //   } catch (error) {
-  //     console.error("Authentication Error ***:", error);
-
-  //     // Show error notification
-  //     toast.error("Error occurred during authentication");
-  //   }
-  // };
-
   const userAuthThroughServer = async (route, data) => {
     try {
       const response = await axios.post(`http://localhost:3000${route}`, data);
 
-      console.log("Request made to:", route);
-      console.log("Server response:", response.data);
+      // DEBUG
+      // console.log("Request made to:", route);
+      // console.log("Server response:", response.data);
 
       if (!response.data || !response.data.access_token) {
         throw new Error("Invalid server response: Missing access token");
@@ -53,12 +33,20 @@ export default function AuthForm({ type }) {
 
       const userData = response.data;
 
-      // Store user data in session
+      //! note user is stored in session
       storeInSession("user", JSON.stringify(userData));
-
+      
       // Update user auth state
       setUserAuth(userData);
-
+      
+      /*  //* note  user data contains: 
+        *  return {
+        * access_token,
+        * profile_img: user.personal_info.profile_img,
+        * fullname: user.personal_info.fullname,
+        * username: user.personal_info.username
+        * };
+        */
       // Show success notification
       toast.success("Authentication successful");
     } catch (error) {
@@ -67,13 +55,11 @@ export default function AuthForm({ type }) {
 
       // Handle specific error types
       if (error.response) {
-        // Server responded with a status code outside the 2xx range
+        // Server responded
         toast.error(`Server error: ${error.response.data.message || "Unknown error"}`);
       } else if (error.request) {
-        // No response received from the server
         toast.error("Network error: Please check your internet connection");
       } else {
-        // Something went wrong in setting up the request
         toast.error("Request error: Please try again");
       }
     }
@@ -181,8 +167,6 @@ export default function AuthForm({ type }) {
               </Link>
             </p>
           )}
-
-          
         </form>
       </section>
     </AnimationWrapper>

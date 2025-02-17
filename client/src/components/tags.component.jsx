@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { EditorContext } from "../pages/editor.pages";
 
-export default function Tags({ tag, tagIndex}) {
+export default function Tags({ tag, tagIndex }) {
   let {
     blog,
     blog: { tags },
@@ -11,8 +11,15 @@ export default function Tags({ tag, tagIndex}) {
   const handleTagKeyDown = (e) => {
     if (e.key === "Enter" || e.keyCode === 13) {
       e.preventDefault();
-      tags[tagIndex] = e.target.innerText;
-      setBlog({ ...blog, tags });
+      // tags[tagIndex] = e.target.innerText;
+      // setBlog({ ...blog, tags });
+
+      // Create a new array to avoid mutating the state directly
+      const updatedTags = blog.tags.map((item, index) =>
+        index === tagIndex ? e.target.innerText : item
+      );
+      setBlog({ ...blog, tags: updatedTags });
+
       e.target.setAttribute("contentEditable", "false");
     }
   };
@@ -23,8 +30,8 @@ export default function Tags({ tag, tagIndex}) {
   };
 
   const handleTagDelete = () => {
-    tags = tags.filter((item) => item != tag);
-    setBlog({ ...blog, tags });
+    const updatedTags = blog.tags.filter((item, index) => index !== tagIndex);
+    setBlog({ ...blog, tags: updatedTags });
   };
   return (
     <div className="relative mr-2 mt-2 inline-block rounded-full bg-white p-2 px-5 pr-10 hover:bg-opacity-50">

@@ -10,16 +10,26 @@ import { useNavigate } from "react-router-dom";
 export default function PublishForm() {
   let charLimit = 200;
   let tagLimit = 10;
+  let { userAuth: { access_token } } = useContext(UserContext);
   let {
     blog,
-    blog: { banner, title, tags, des },
+    blog: { banner, content, title, tags, des },
+    setBlog,
+    editorState,  // by default editor
     setEditorState,
-    setBlog
   } = useContext(EditorContext);
 
-  let navigate = useNavigate();
+  //todo: this is blog object taken from editor context
+  // const blog = {
+  //   title: "",
+  //   banner: "", 
+  //   content: [],
+  //   tags: [],
+  //   des: "",
+  //   author: { personal_info: {} }
+  // };
 
-  let { userAuth: { access_token } } = useContext(UserContext);
+  let navigate = useNavigate();
 
   const handleClick = () => {
     setEditorState("editor");
@@ -57,69 +67,155 @@ export default function PublishForm() {
       }
     }
   };
+  //! causing error
+  // const publishBlog = (e) => {
 
-  const publishBlog = (e) => {
+  //   if (e.target.className.includes("disable")) {
+  //     return;
+  //   }
 
+  //   if (!title.length) {
+  //     toast.error("Please enter a title");
+  //     return;
+  //   }
+
+  //   if (!des.length || des.length > charLimit) {
+  //     toast.error(`Description must be at least ${charLimit} characters long`);
+  //     return;
+  //   }
+
+  //   if (!tags.length || tags.length > tagLimit) {
+  //     toast.error("Please add at Tag");
+  //     return;
+  //   }
+
+  //   let loadingToast = toast.loading("Publishing...");
+
+  //   e.target.classList.add("disable");
+  //   let blogObject = {
+  //     title,
+  //     content,  //todo err
+  //     des,
+  //     tags,
+  //     banner,
+  //     draft: false
+  //   };
+
+  //   axios.post("http://localhost:3000/create-blog", blogObject, {
+  //     headers: {
+  //       // "Content-Type": "application/json",
+  //       Authorization: `Bearer ${access_token}`
+  //     }
+  //   })
+  //     .then((res) => {
+  //       e.target.classList.remove("disable");
+  //       toast.dismiss(loadingToast);
+  //       toast.success("Blog published successfully");
+
+  //       setTimeout(() => {
+  //         navigate(`/`);
+  //       }, 500);
+  //     })
+  //     .catch(({ response }) => {
+  //       e.target.classList.remove("disable");
+  //       toast.dismiss(loadingToast);
+  //       toast.error(response.data.msg);
+  //       toast.error(response.data.error);
+  //     })
+  // };
+
+  //*  ALTERNATE CODE
+  const publishBlog = async (e) => {
     if (e.target.className.includes("disable")) {
       return;
     }
 
-    if (!title.length) {
+    if (!title.trim()) {
       toast.error("Please enter a title");
       return;
     }
 
-    if (!des.length || des.length > charLimit) {
+    if (!des.trim() || des.length > charLimit) {
       toast.error(`Description must be at least ${charLimit} characters long`);
       return;
     }
 
     if (!tags.length || tags.length > tagLimit) {
-      toast.error("Please add at Tag");
+      toast.error("Please add at least one tag (Max 10)");
+      return;
+    }
+
+    if (!banner) {
+      toast.error("Please upload a banner image");
       return;
     }
 
     let loadingToast = toast.loading("Publishing...");
 
     e.target.classList.add("disable");
-    let blogObject = {
-      title,
-      content,
-      des,
-      tags,
-      banner,
-      draft: false
-    };
 
-    axios.post("http://localhost:3000/create-blog", blogObject, {
-      headers: {
-        // "Content-Type": "application/json",
-        Authorization: `Bearer ${access_token}`
-      }
-    })
-      .then((res) => {
-        e.target.classList.remove("disable");
-        toast.dismiss(loadingToast);
-        toast.success("Blog published successfully");
+    try {
+      // Fetch content from the editor
+      // const textEditor = window.editorInstance; // Ensure you have a reference to the editor
+      // if (!textEditor || !textEditor.isReady) {
+      //   toast.error("Editor is not ready. Try again.");
+      //   return;
+      // }
 
-        setTimeout(() => {
-          navigate(`/`);
-        }, 500);
-      })
-      .catch(({ response }) => {
-        e.target.classList.remove("disable");
-        toast.dismiss(loadingToast);
-        toast.error(response.data.msg);
-        toast.error(response.data.error);
-      })
+      // const editorContent = await textEditor.save();
+      // if (!editorContent.blocks.length) {
+      //   toast.error("Blog content cannot be empty");
+      //   e.target.classList.remove("disable");
+      //   return;
+      // }
+
+
+      let blogObject = {
+        title,
+        content: content,
+        des,
+        tags,
+        banner,
+        draft: false,
+      };
+      console.log(blogObject);
+
+
+      await axios.post("http://localhost:3000/create-blog", blogObject, {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
+      });
+
+
+
+      toast.dismiss(loadingToast);
+
+
+
+
+      toast.success("Blog published successfully");
+
+      setTimeout(() => {
+        navigate(`/`);
+      }, 500);
+    } catch (error) {
+      e.target.classList.remove("disable");
+      toast.dismiss(loadingToast);
+      toast.error(error.response?.data?.msg || "Failed to publish the blog");
+    }
   };
+
+
   return (
     <AnimationWrapper>
       <section className="grid min-h-screen w-screen items-center py-16 lg:grid-cols-2 lg:gap-4">
         <Toaster />
 
-        <button className="absolute right-[5vw] top-[5%] z-10 h-12 w-12 lg:top-[10%]">
-          onClick = {handleClick}
+        <button
+          onClick={handleClick}
+          className="absolute right-[5vw] top-[5%] z-10 h-12 w-12 lg:top-[10%]">
+
           <i className="ff fi-br-cross"></i>
         </button>
 
@@ -154,10 +250,11 @@ export default function PublishForm() {
             {charLimit - des.length} Characters left
           </p>
 
-          <p className="text-dark-grey mb-2 mt-9">
-            topics - (Help us searching and ranking your blog post){" "}
-          </p>
 
+          {/* //? tag section */}
+          <p className="text-dark-grey mb-2 mt-9">
+            topics - ( Help us searching and ranking your blog post ){" "}
+          </p>
           <div className="input-box relative py-2 pb-4 pl-2">
             <input
               type="text"
@@ -165,10 +262,13 @@ export default function PublishForm() {
               className="input-box sticky left-0 top-0 mb-3 bg-white pl-4 focus:bg-white"
               onKeyDown={handleTagKeyDown}
             />
-            {tags.map((tag, i) => {
-              <Tags tag={tag} key={i} tagIndex={i} />;
-            })}
+            {/* //todo: blunder happened use () not {}  */}
+            {tags.map((tag, i) => (
+              <Tags tag={tag} key={i} tagIndex={i} />
+            ))}
           </div>
+
+
           <p className="text-dark-grey mb-4 mt-1 text-right text-sm">
             {tagLimit - tags.length} Tags left
           </p>

@@ -116,7 +116,7 @@ export const tools = {
     }
   },
 
-  //todo: configure link 
+  //?-todo: configure link 
   link: {
     class: LinkTool,
     config: {
@@ -145,7 +145,7 @@ export const tools = {
 
 // import Embed from "@editorjs/embed";
 // import Image from "@editorjs/image";
-// // import LinkTool from "@editorjs/link";
+// import LinkTool from "@editorjs/link";
 // import List from "@editorjs/list";
 // import Quote from "@editorjs/quote";
 // // import { Editor } from "@toast-ui/react-editor";

@@ -57,6 +57,8 @@ export default function Navbar() {
             <p>Write</p>
           </Link>
 
+          {/* //TODO: this point distinguish between logedin and unlogedin users */}
+
           {access_token ? (
             <>
               {/* Notifications */}

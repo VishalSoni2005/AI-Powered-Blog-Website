@@ -25,15 +25,18 @@ export default function Editor() {
   } = useContext(UserContext);
 
   return (
-    <EditorContext.Provider
-      value={{ blog, setBlog, editorState, setEditorState, textEditor, setTextEditor }}>
-      {access_token === null ? (
-        <Navigate to="/signin" />
-      ) : editorState === "editor" ? (
-        <BlogEditor />
-      ) : (
-        <PublishForm />
-      )}
+    <EditorContext.Provider value={{ blog, setBlog, editorState, setEditorState, textEditor, setTextEditor }}>
+
+      {access_token === null
+        ?
+        (<Navigate to="/signin" />)
+        :
+        editorState === "editor"
+          ?
+          (<BlogEditor />)
+          :
+          (<PublishForm />)
+      }
     </EditorContext.Provider>
   );
 }
