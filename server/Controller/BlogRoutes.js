@@ -7,7 +7,17 @@ export const CreateBlog = async (req, res) => {
 
   try {
     const authId = req.user;
-    const { title, des, tags, banner, content, draft } = req.body;
+    let { title, des, tags, banner, content, draft } = req.body;
+
+    //* this is req.body content
+    // let blogObject = {
+    //   title,
+    //   content: content,
+    //   des,
+    //   tags,
+    //   banner,
+    //   draft: false
+    // };
 
     if (!title) {
       return res.status(400).json({
@@ -15,46 +25,58 @@ export const CreateBlog = async (req, res) => {
         note: "Title is required"
       });
     }
+
+    //* buggy code
+    // if (!draft) {
+    //   if (!title || !des) {
+    //     return res.status(400).json({
+    //       message: "Bad Request",
+    //       note: "Please fill all the fields"
+    //     });
+    //   }
+    //   if (!banner.length) {
+    //     return res.status(400).json({
+    //       message: "Bad Request",
+    //       note: "Please upload a banner image"
+    //     });
+    //   }
+
+    //   //* content is object generated from editorjs.
+    //   //* content object contain block array
+    //   if (!content.blocks.length) {
+    //     //!error expected
+    //     return res.status(400).json({
+    //       message: "Bad Request",
+    //       note: "Please write some content"
+    //     });
+    //   }
+
+    //   if (!tags.length) {
+    //     return res.status(400).json({
+    //       message: "Bad Request",
+    //       note: "Please add tags"
+    //     });
+    //   }
+    // }
+
+    //* optimaized code
     if (!draft) {
-      if (!title || !des) {
+      if (!des || !banner || !content?.blocks?.length || !tags?.length) {
         return res.status(400).json({
           message: "Bad Request",
-          note: "Please fill all the fields"
-        });
-      }
-      if (!banner.length) {
-        return res.status(400).json({
-          message: "Bad Request",
-          note: "Please upload a banner image"
-        });
-      }
-
-      //* content is object generated from editorjs.
-      //* content object contain block array
-      if (!content.blocks.length) {
-        //!error expected
-        return res.status(400).json({
-          message: "Bad Request",
-          note: "Please write some content"
-        });
-      }
-
-      if (!tags.length) {
-        return res.status(400).json({
-          message: "Bad Request",
-          note: "Please add tags"
+          note: "Please fill all required fields"
         });
       }
     }
+
     //* lowercasing all tags
     tags = tags.map((i) => i.toLowerCase());
 
     //todo: creating dynamic blog id
-    const blogId = title
+    const blogId = `${title
       .replace(/[^a-zA-Z0-9]/g, " ")
       .replace(/\s+/g, "-")
-      .trim()
-      .nanoid();
+      .trim()}-${nanoid(8)}`;
 
     const blog = new Blog({
       blog_id: blogId,
@@ -66,25 +88,42 @@ export const CreateBlog = async (req, res) => {
       author: authId,
       draft: Boolean(draft)
     });
-    await blog.save().then((blog) => {
-      let incrementVal = draft ? 0 : 1;
+    // await blog.save().then((blog) => {
+    //   let incrementVal = draft ? 0 : 1;
 
-      User.findOneAndUpdate(
-        {
-          _id: authId
-        },
-        {
-          $inc: { "account_info.total_posts": incrementVal },
-          $push: {
-            blogs: blog._id
-          }
-        }
-      );
-      res.status(201).json({
-        message: "Blog created successfully",
-        data: blog,
-        id: blog.blog_id
-      });
+    //   User.findOneAndUpdate(
+    //     {
+    //       _id: authId
+    //     },
+    //     {
+    //       $inc: { "account_info.total_posts": incrementVal },
+    //       $push: {
+    //         blogs: blog._id
+    //       }
+    //     }
+    //   );
+    //   res.status(201).json({
+    //     message: "Blog created successfully",
+    //     data: blog,
+    //     id: blog.blog_id
+    //   });
+    // });
+
+    await blog.save();
+    const incrementVal = draft ? 0 : 1;
+
+    await User.findOneAndUpdate(
+      { _id: authId },
+      {
+        $inc: { "account_info.total_posts": incrementVal },
+        $push: { blogs: blog._id }
+      }
+    );
+
+    res.status(201).json({
+      message: "Blog created successfully",
+      data: blog,
+      id: blog.blog_id
     });
   } catch (e) {
     return res.status(500).json({
