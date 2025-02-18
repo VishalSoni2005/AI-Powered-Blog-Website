@@ -26,7 +26,7 @@ export const CreateBlog = async (req, res) => {
       });
     }
 
-    //* buggy code
+    // //* buggy code
     // if (!draft) {
     //   if (!title || !des) {
     //     return res.status(400).json({
@@ -133,10 +133,37 @@ export const latestBlogs = async (req, res) => {
     //todo: each object contain blog_id, title, des, banner, activity, tags, publishedAt, and user info from user schema
 
     // console.log("blogData -> ", blogData);
-    
+
     res.status(200).json({
       message: "Success",
       blogs: blogData
+    });
+  } catch (err) {
+    return res.status(500).json({
+      message: "Internal server error",
+      note: "Error in get latest blog request"
+    });
+  }
+};
+
+export const trendingBlogs = async (req, res) => {
+  try {
+    const blogs = await Blog.find({ draft: false })
+      .populate(
+        "author",
+        "personal_info.profile_img personal_info.username personal_info.fullname -_id"
+      )
+      .sort({
+        "activity.total_read": -1,
+        "activity.total_likes": -1,
+        publishedAt: -1
+      }) // sort on basis of number of read
+      .select("blog_id title publishedAt -_id")
+      .limit(5);
+
+    res.status(200).json({
+      message: "Success",
+      blogs
     });
   } catch (err) {
     return res.status(500).json({

@@ -1,7 +1,11 @@
 import express from "express";
 import { signup, signin, googleAuth } from "../Controller/AuthController.js";
 import { uploadBanner } from "../Controller/Upload.js"; // Use named import
-import { CreateBlog, latestBlogs } from "../Controller/BlogRoutes.js";
+import {
+  CreateBlog,
+  latestBlogs,
+  trendingBlogs
+} from "../Controller/BlogRoutes.js";
 import { verifyJWT } from "../Middlewares/VerifyJWT.js";
 
 const router = express.Router();
@@ -15,7 +19,8 @@ router.post("/google-auth", googleAuth);
 router.post("/upload", uploadBanner);
 
 // Create Blog route
-router.get("/latest-blogs", latestBlogs);
 router.post("/create-blog", verifyJWT, CreateBlog);
+router.get("/latest-blogs", latestBlogs);
+router.get("/trending-blog", trendingBlogs);
 
 export default router;
