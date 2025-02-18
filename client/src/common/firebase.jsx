@@ -16,13 +16,16 @@ const app = initializeApp(firebaseConfig);
 
 // Initialize Auth
 const provider = new GoogleAuthProvider();
-const auth = getAuth();
+const auth = getAuth(app);
 
 export const authWithGoogle = async () => {
   let user = null;
   try {
     const result = await signInWithPopup(auth, provider);
-    user = result.user;
+
+    //! BUG FIXXXED
+    //* this user will contain the access token as accessToken, google provides it
+    user = result.user; 
   } catch (error) {
     console.error("Error during Google sign-in:", error);
   }

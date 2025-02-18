@@ -104,12 +104,16 @@ export default function AuthForm({ type }) {
     e.preventDefault();
     authWithGoogle()
       .then((user) => {
+
+        const accessToken = user.accessToken;
+        console.log("User from google auth => ", user);
+        
         let serverRoute = "/google-auth";
         let formData = {
-          access_token: user.access_token
+          access_token: accessToken
         };
         userAuthThroughServer(serverRoute, formData);
-        console.log("User from google auth => ", user);
+        // console.log("User from google auth => ", user);
       })
       .catch((err) => {
         console.error("Error from authform at handle google auth => ", err);
