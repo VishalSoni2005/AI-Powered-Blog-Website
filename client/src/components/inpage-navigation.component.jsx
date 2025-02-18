@@ -32,7 +32,7 @@ export default function InPageNavigation({
               key={i}
               className={
                 `p-4 px-5 capitalize ` +
-                (inPageNavIdx == i ? "text-black" : "text-dark-grey") +
+                (inPageNavIdx == i ? "text-black" : "text-dark-grey ") +
                 (defaultHidden.includes(route) ? "md:hidden" : "")
               }
               onClick={(e) => {
