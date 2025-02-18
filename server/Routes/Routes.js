@@ -21,6 +21,6 @@ router.post("/upload", uploadBanner);
 // Create Blog route
 router.post("/create-blog", verifyJWT, CreateBlog);
 router.get("/latest-blogs", latestBlogs);
-router.get("/trending-blog", trendingBlogs);
+router.get("/trending-blogs", trendingBlogs);
 
 export default router;

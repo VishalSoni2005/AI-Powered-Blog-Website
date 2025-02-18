@@ -9,7 +9,6 @@ import admin from "firebase-admin";
 import { getAuth } from "firebase-admin/auth";
 import serviceAccountKey from "../../../blog-website-001-firebase-adminsdk-fbsvc-1cbf77c0ff.json" assert { type: "json" };
 
-
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccountKey)
 });
@@ -136,7 +135,7 @@ export const signin = async (req, res) => {
         .json({ success: false, message: "User not found" });
     }
 
-    if(!user.google_auth) {
+    if (!user.google_auth) {
       const isPasswordValid = await bcrypt.compare(
         password,
         user.personal_info.password
@@ -147,7 +146,6 @@ export const signin = async (req, res) => {
           .json({ success: false, message: "Invalid credentials" });
       }
       res.json(formatDataToSend(user));
-
     } else {
       return res.status(403).json({
         success: false,
@@ -228,10 +226,8 @@ export const signin = async (req, res) => {
 //     });
 // };
 
-
 export const googleAuth = async (req, res) => {
   try {
-    
     let { access_token } = req.body;
     const decodedUser = await getAuth().verifyIdToken(access_token);
     let { email, name, picture } = decodedUser;
