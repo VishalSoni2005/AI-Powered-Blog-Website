@@ -88,26 +88,6 @@ export const CreateBlog = async (req, res) => {
       author: authId,
       draft: Boolean(draft)
     });
-    // await blog.save().then((blog) => {
-    //   let incrementVal = draft ? 0 : 1;
-
-    //   User.findOneAndUpdate(
-    //     {
-    //       _id: authId
-    //     },
-    //     {
-    //       $inc: { "account_info.total_posts": incrementVal },
-    //       $push: {
-    //         blogs: blog._id
-    //       }
-    //     }
-    //   );
-    //   res.status(201).json({
-    //     message: "Blog created successfully",
-    //     data: blog,
-    //     id: blog.blog_id
-    //   });
-    // });
 
     await blog.save();
     const incrementVal = draft ? 0 : 1;
@@ -129,6 +109,39 @@ export const CreateBlog = async (req, res) => {
     return res.status(500).json({
       message: "Internal server error",
       note: "Error in Create Blog request"
+    });
+  }
+};
+
+//* get all blog entries
+export const latestBlogs = async (req, res) => {
+  try {
+    let maxLimit = 5;
+
+    //todo: this populate method will add the user info form user schema to blog schema
+    const blogData = await Blog.find({ draft: false })
+      .populate(
+        "author",
+        "personal_info.profile_img personal_info.username personal_info.fullname -_id"
+      )
+      .sort({ publishedAt: -1 }) //? to get latest blog first and old as ordered
+      .select("blog_id title des banner activity tags publishedAt -_id")
+      .limit(maxLimit);
+
+    //? this is send to frontend blog object
+    //todo: blogdata is an object contain maxLimit's number of objects and
+    //todo: each object contain blog_id, title, des, banner, activity, tags, publishedAt, and user info from user schema
+
+    // console.log("blogData -> ", blogData);
+    
+    res.status(200).json({
+      message: "Success",
+      blogs: blogData
+    });
+  } catch (err) {
+    return res.status(500).json({
+      message: "Internal server error",
+      note: "Error in get latest blog request"
     });
   }
 };
