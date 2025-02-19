@@ -1,22 +1,63 @@
 import React, { useEffect, useState } from "react";
 import AnimationWrapper from "../common/page-animation";
 import axios from "axios";
-import InPageNavigation from "../components/inpage-navigation.component";
+import InPageNavigation, { activeTabRef } from "../components/inpage-navigation.component";
 import Loader from "../components/loader.component";
 import BlogPostCard from "../components/blog-post.component";
 import MinimalBlogPost from "../components/nobanner-blog-post.component";
+import NaMsgData from "../components/nodata.component";
 
 export default function HomePage() {
   let [blogs, setBlogs] = useState(null);
   let [trendingBlogs, setTrendingBlogs] = useState(null);
+  let [pageState, setPageState] = useState("home"); //* setting up the page state
 
   //todo: modify this
-  let categories = ["AI", "Tech", "Finance", "LIC"];
+
+  let categories = [
+    "ai",
+    "tech",
+    "finance",
+    "lic",
+    "travel",
+    "business",
+    "education",
+    "health",
+    "property",
+    "politics",
+    "manipulation",
+    "psychological"
+  ];
 
   useEffect(() => {
-    getLatestBlogs();
-    getTrendingBlogs();
-  }, []);
+    activeTabRef.current.click();
+
+    if (pageState == "home") {
+      getLatestBlogs();
+    } else {
+      getBlogsByCategory(pageState);
+    }
+
+    if (!trendingBlogs) {
+      getTrendingBlogs();
+    }
+  }, [pageState]);
+
+  const getBlogsByCategory = async (category) => {
+    try {
+      const request = await axios.post("http://localhost:3000/search-blogs", {
+        category: pageState
+      });
+
+      const reqData = await request.data.blogs;
+
+      setBlogs(reqData);
+      console.log("blogsArray => ", reqData); // show value after first render
+    } catch (err) {
+      console.error("Error fetching blogs by category", err);
+      toast.error("Error fetching blogs by category: " + category);
+    }
+  };
 
   const getLatestBlogs = async () => {
     // use this funciton in useEffect to get latest blogs
@@ -46,19 +87,30 @@ export default function HomePage() {
   };
 
   //! start from here
-  const filterBlogsByCategory = (category) => {
-    console.log("category => ", category);
+  const filterBlogsByCategory = (e) => {
+    let category = e.target.innerText.toLowerCase();
+
+    setBlogs(null); //todo
+
+    if (pageState == category) {
+      setPageState("home");
+      return;
+    }
+
+    setPageState(category);
   };
   return (
     <AnimationWrapper>
       <section className="h-cover flex justify-center gap-10">
         {/* latest blogs */}
         <div className="w-full">
-          <InPageNavigation defaultHidden={["trending blogs"]} routes={["home", "trending blogs"]}>
+          <InPageNavigation
+            defaultHidden={["trending blogs"]}
+            routes={[pageState, "trending blogs"]}>
             <>
               {blogs == null ? (
                 <Loader />
-              ) : (
+              ) : blogs.length ? (
                 blogs.map((blog, i) => {
                   return (
                     <AnimationWrapper transition={{ duration: 1, delay: i * 0.1 }} key={i}>
@@ -66,12 +118,14 @@ export default function HomePage() {
                     </AnimationWrapper>
                   );
                 })
+              ) : (
+                <NaMsgData message={"No blog found"} />
               )}
             </>
 
             {trendingBlogs == null ? (
               <Loader />
-            ) : (
+            ) : trendingBlogs.length ? (
               trendingBlogs.map((blog, i) => {
                 return (
                   <AnimationWrapper transition={{ duration: 1, delay: i * 0.1 }} key={i}>
@@ -79,6 +133,8 @@ export default function HomePage() {
                   </AnimationWrapper>
                 );
               })
+            ) : (
+              <NaMsgData message={"No trending blog found"} />
             )}
           </InPageNavigation>
         </div>
@@ -90,7 +146,10 @@ export default function HomePage() {
               <h1 className="mb-8 text-xl font-medium">Your Trending Blogs</h1>
               <div className="flex flex-wrap gap-3">
                 {categories.map((category, i) => (
-                  <button onClick={filterBlogsByCategory} className="tag" key={i}>
+                  <button
+                    onClick={filterBlogsByCategory}
+                    className={`tag ` + (pageState == category ? "bg-black text-white" : "")}
+                    key={i}>
                     {category}
                   </button>
                 ))}
@@ -104,7 +163,7 @@ export default function HomePage() {
 
               {trendingBlogs == null ? (
                 <Loader />
-              ) : (
+              ) : trendingBlogs.length ? (
                 trendingBlogs.map((blog, i) => {
                   return (
                     <AnimationWrapper transition={{ duration: 1, delay: i * 0.1 }} key={i}>
@@ -112,6 +171,8 @@ export default function HomePage() {
                     </AnimationWrapper>
                   );
                 })
+              ) : (
+                <NaMsgData message={"No trending blog found"} />
               )}
             </div>
           </div>

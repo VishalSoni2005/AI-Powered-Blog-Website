@@ -1,13 +1,17 @@
 import React, { useEffect, useRef, useState } from "react";
 
+export let activeTabLineRef;
+export let activeTabRef;
+
 export default function InPageNavigation({
   routes,
   defaultActiveIdx = 0,
   defaultHidden = [],
   children
 }) {
-  const activeTabLineRef = useRef();
-  const activeTabRef = useRef();
+  activeTabLineRef = useRef(); //! export this to change hr when bhog changes
+  activeTabRef = useRef(); //! note how to export it
+
   const [inPageNavIdx, setInPageNavIdx] = useState(defaultActiveIdx);
 
   const changePageState = (btn, i) => {
@@ -32,8 +36,8 @@ export default function InPageNavigation({
               key={i}
               className={
                 `p-4 px-5 capitalize ` +
-                (inPageNavIdx == i ? "text-black" : "text-dark-grey ") +
-                (defaultHidden.includes(route) ? "md:hidden" : "")
+                (inPageNavIdx == i ? "text-black" : "text-dark-grey") +
+                (defaultHidden.includes(route) ? " md:hidden" : "")
               }
               onClick={(e) => {
                 changePageState(e.target, i);

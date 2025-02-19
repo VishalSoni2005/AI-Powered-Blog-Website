@@ -15,7 +15,7 @@ export default function MinimalBlogPost({ blog, index }) {
   } = blog;
   return (
     <Link to={`/blog/${id}`} className="mb-8 flex gap-5">
-      <h1 className="blog-index"> {index > 10 ? "0" + (index + 1) : index + 1} </h1>
+      <h1 className="blog-index"> {index < 10 ? "0" + (index + 1) : index + 1} </h1>
 
       <div>
         <div className="mb-7 flex items-center gap-2">
