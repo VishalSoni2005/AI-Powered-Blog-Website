@@ -172,3 +172,32 @@ export const trendingBlogs = async (req, res) => {
     });
   }
 };
+
+export const searchBlogs = async (req, res) => {
+  try {
+    let { category } = req.body; //! Debug
+
+    let findQuery = { tags: category, draft: false };
+
+    let maxLimit = 5;
+
+    const blogs = await Blog.find(findQuery)
+      .populate(
+        "author",
+        "personal_info.profile_img personal_info.username personal_info.fullname -_id"
+      )
+      .sort({ publishedAt: -1 })
+      .select("blog_id title des banner activity tags publishedAt -_id")
+      .limit(maxLimit);
+
+    res.status(200).json({
+      message: "Success",
+      blogs
+    });
+  } catch (err) {
+    return res.status(500).json({
+      message: "Internal server error",
+      note: "Error in search blog request"
+    });
+  }
+};

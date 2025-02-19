@@ -4,6 +4,7 @@ import { uploadBanner } from "../Controller/Upload.js"; // Use named import
 import {
   CreateBlog,
   latestBlogs,
+  searchBlogs,
   trendingBlogs
 } from "../Controller/BlogRoutes.js";
 import { verifyJWT } from "../Middlewares/VerifyJWT.js";
@@ -20,6 +21,7 @@ router.post("/upload", uploadBanner);
 
 // Create Blog route
 router.post("/create-blog", verifyJWT, CreateBlog);
+router.post('/search-blogs', searchBlogs);
 router.get("/latest-blogs", latestBlogs);
 router.get("/trending-blogs", trendingBlogs);
 
