@@ -3,8 +3,11 @@ import { Link, Outlet } from "react-router-dom";
 import Logo from "../imgs/logo.png";
 // import logoTwo from '../imgs/pen.svg';
 
+import logoTwo from '../imgs/blog.svg';
+
 import { UserContext } from "../App";
 import UserNavigationPanel from "./user-navigation.component";
+import defaultAvatar from "../imgs/user.png";
 
 export default function Navbar() {
   const [searchBoxVisibility, setSearchBoxVisibility] = useState(false);
@@ -27,13 +30,15 @@ export default function Navbar() {
     <>
       <nav className="navbar">
         <Link to="/" className="w-10 flex-none">
-          <img src={Logo} alt="Logo" />
+          <img src={logoTwo} alt="Logo" />
         </Link>
+
+        <p className=" -translate-x-6 font-gelasio text-2xl hidden md:block transform-gpu duration-150 ">Vishal Writes</p>
 
         {/* Search Bar */}
         <div
           className={`border-grey absolute left-0 top-full mt-0.5 w-full border-b bg-white px-[5vw] py-4 md:relative md:inset-0 md:block md:w-auto md:border-0 md:p-0 ${
-            searchBoxVisibility ? "show" : "hide"
+            searchBoxVisibility ? "hide" : "show"
           }`}>
           <input
             type="text"
@@ -47,7 +52,7 @@ export default function Navbar() {
           {/* Mobile Search Button */}
           <button
             className="bg-grey flex h-12 w-12 items-center justify-center rounded-full md:hidden"
-            onClick={() => setSearchBoxVisibility(prev => !prev)}>
+            onClick={() => setSearchBoxVisibility((prev) => !prev)}>
             <i className="fi fi-rr-search text-xl"></i>
           </button>
 
@@ -73,8 +78,7 @@ export default function Navbar() {
                 <button className="mt-1 h-12 w-12" onClick={handleUserNavPanel}>
                   <img
                     className="h-full w-full rounded-full object-cover"
-                    src={profile_img || "/default-avatar.png"}
-                    alt="Profile Pic"
+                    src={profile_img || defaultAvatar}
                   />
                 </button>
 

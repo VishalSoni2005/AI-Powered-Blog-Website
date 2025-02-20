@@ -18,6 +18,8 @@ export default function HomePage() {
     "ai",
     "tech",
     "finance",
+    "stock",
+    "market",
     "lic",
     "travel",
     "business",
@@ -102,6 +104,7 @@ export default function HomePage() {
   return (
     <AnimationWrapper>
       <section className="h-cover flex justify-center gap-10">
+
         {/* latest blogs */}
         <div className="w-full">
           <InPageNavigation
@@ -139,7 +142,7 @@ export default function HomePage() {
           </InPageNavigation>
         </div>
 
-        {/* popular blogs and filter */}
+        {/* trending blogs and filter */}
         <div className="border-1 border-grey min-w-[40%] max-w-min pl-8 pt-3 max-md:hidden lg:min-w-[400px]">
           <div className="flex flex-col gap-10">
             <div className="">
