@@ -173,6 +173,7 @@ export const trendingBlogs = async (req, res) => {
   }
 };
 
+//? seach blog according to tag
 export const searchBlogs = async (req, res) => {
   try {
     let { category } = req.body; //! Debug
