@@ -6,6 +6,7 @@ import Loader from "../components/loader.component";
 import BlogPostCard from "../components/blog-post.component";
 import MinimalBlogPost from "../components/nobanner-blog-post.component";
 import NaMsgData from "../components/nodata.component";
+import { filterPaginationData } from "../common/filter-pagination-data";
 
 export default function HomePage() {
   let [blogs, setBlogs] = useState(null);
@@ -61,14 +62,19 @@ export default function HomePage() {
     }
   };
 
-  const getLatestBlogs = async () => {
+  const getLatestBlogs = async (page = 1) => {
     // use this funciton in useEffect to get latest blogs
     try {
-      const latestBlog = await axios.get("http://localhost:3000/latest-blogs");
+      const latestBlog = await axios.post("http://localhost:3000/latest-blogs", { page });
 
-      const blogsArray = latestBlog.data.blogs;
+      const formatedData = await filterPaginationData({
+        state: blogs,
+        data: latestBlog.data.blogs,
+        page,
+        countRoute: "/all-latest-blogs-count"
+      });
 
-      setBlogs(blogsArray); //! blog from backend is stored to useState form here
+      setBlogs(formatedData); //! blog from backend is stored to useState form here
       // console.log("blogsArray => ", blogsArray);
       // console.log("blogsArray => ", blogs); // show value after first render
     } catch (err) {
@@ -104,7 +110,6 @@ export default function HomePage() {
   return (
     <AnimationWrapper>
       <section className="h-cover flex justify-center gap-10">
-
         {/* latest blogs */}
         <div className="w-full">
           <InPageNavigation
@@ -113,8 +118,8 @@ export default function HomePage() {
             <>
               {blogs == null ? (
                 <Loader />
-              ) : blogs.length ? (
-                blogs.map((blog, i) => {
+              ) : blogs.results.length ? (
+                blogs.results.map((blog, i) => {
                   return (
                     <AnimationWrapper transition={{ duration: 1, delay: i * 0.1 }} key={i}>
                       <BlogPostCard content={blog} author={blog.author.personal_info} />
