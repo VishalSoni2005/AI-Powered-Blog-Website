@@ -118,6 +118,8 @@ export const latestBlogs = async (req, res) => {
   try {
     let maxLimit = 5;
 
+    let { page } = req.body;
+
     //todo: this populate method will add the user info form user schema to blog schema
     const blogData = await Blog.find({ draft: false })
       .populate(
@@ -126,6 +128,7 @@ export const latestBlogs = async (req, res) => {
       )
       .sort({ publishedAt: -1 }) //? to get latest blog first and old as ordered
       .select("blog_id title des banner activity tags publishedAt -_id")
+      .skip((page - 1) * maxLimit) //* skip the doc
       .limit(maxLimit);
 
     //? this is send to frontend blog object
@@ -199,6 +202,21 @@ export const searchBlogs = async (req, res) => {
     return res.status(500).json({
       message: "Internal server error",
       note: "Error in search blog request"
+    });
+  }
+};
+
+export const countLatestBlogs = async (req, res) => {
+  try {
+    const count = await Blog.countDocuments({ draft: false });
+    res.status(200).json({
+      message: "Success",
+      totalDocs: count
+    });
+  } catch (err) {
+    return res.status(500).json({
+      message: "Internal server error",
+      note: "Error in get latest blog count request"
     });
   }
 };
