@@ -177,13 +177,50 @@ export const trendingBlogs = async (req, res) => {
 };
 
 //? seach blog according to tag
+// export const searchBlogs = async (req, res) => {
+//   try {
+//     let { category, page } = req.body; //! Debug
+
+//     let findQuery = { tags: category, draft: false };
+
+//     let maxLimit = 2;
+
+//     const blogs = await Blog.find(findQuery)
+//       .populate(
+//         "author",
+//         "personal_info.profile_img personal_info.username personal_info.fullname -_id"
+//       )
+//       .sort({ publishedAt: -1 })
+//       .select("blog_id title des banner activity tags publishedAt -_id")
+//       .skip((page - 1) * maxLimit)
+//       .limit(maxLimit);
+
+//     res.status(200).json({
+//       message: "Success",
+//       blogs
+//     });
+//   } catch (err) {
+//     return res.status(500).json({
+//       message: "Internal server error",
+//       note: "Error in search blog request"
+//     });
+//   }
+// };
+
+
 export const searchBlogs = async (req, res) => {
   try {
-    let { category } = req.body; //! Debug
+    let { category, page = 1 } = req.body;
 
-    let findQuery = { tags: category, draft: false };
+    if (!category) {
+      return res.status(400).json({
+        message: "Bad Request",
+        note: "Category (tag) is required"
+      });
+    }
 
-    let maxLimit = 5;
+    let findQuery = { tags: { $in: [category.toLowerCase()] }, draft: false };
+    let maxLimit = 2;
 
     const blogs = await Blog.find(findQuery)
       .populate(
@@ -192,6 +229,7 @@ export const searchBlogs = async (req, res) => {
       )
       .sort({ publishedAt: -1 })
       .select("blog_id title des banner activity tags publishedAt -_id")
+      .skip((page - 1) * maxLimit)
       .limit(maxLimit);
 
     res.status(200).json({
@@ -199,6 +237,7 @@ export const searchBlogs = async (req, res) => {
       blogs
     });
   } catch (err) {
+    console.error("Error in searchBlogs:", err);
     return res.status(500).json({
       message: "Internal server error",
       note: "Error in search blog request"
@@ -217,6 +256,23 @@ export const countLatestBlogs = async (req, res) => {
     return res.status(500).json({
       message: "Internal server error",
       note: "Error in get latest blog count request"
+    });
+  }
+};
+
+export const searchBlogsCountForCategory = async (req, res) => {
+  try {
+    let { tag } = req.body;
+    let findQuery = { tags: tag, draft: false };
+    const count = await Blog.countDocuments(findQuery);
+    res.status(200).json({
+      message: "Success",
+      totalDocs: count
+    });
+  } catch (err) {
+    return res.status(500).json({
+      message: "Internal server error",
+      note: "Error in search blog count request"
     });
   }
 };

@@ -6,6 +6,7 @@ import {
   CreateBlog,
   latestBlogs,
   searchBlogs,
+  searchBlogsCountForCategory,
   trendingBlogs
 } from "../Controller/BlogRoutes.js";
 import { verifyJWT } from "../Middlewares/VerifyJWT.js";
@@ -22,9 +23,12 @@ router.post("/upload", uploadBanner);
 
 // Blog route
 router.post("/create-blog", verifyJWT, CreateBlog);
-router.post('/search-blogs', searchBlogs);
+router.post("/search-blogs", searchBlogs);
 router.post("/latest-blogs", latestBlogs);
 router.get("/trending-blogs", trendingBlogs);
-router.post('/all-latest-blogs-count', countLatestBlogs);
+
+
+router.post("/all-latest-blogs-count", countLatestBlogs);
+router.post("/search-blogs-count", searchBlogsCountForCategory);
 
 export default router;
