@@ -7,14 +7,16 @@ import BlogPostCard from "../components/blog-post.component";
 import MinimalBlogPost from "../components/nobanner-blog-post.component";
 import NaMsgData from "../components/nodata.component";
 import { filterPaginationData } from "../common/filter-pagination-data";
+import LoadMoreDataBtn from "../components/load-more.component";
 
 export default function HomePage() {
-  let [blogs, setBlogs] = useState(null);
+  let [blogs, setBlogs] = useState(null); //todo: note this blog contain blog data in format as:
+  //* {results:[],page:1,totalDocs:0}
   let [trendingBlogs, setTrendingBlogs] = useState(null);
   let [pageState, setPageState] = useState("home"); //* setting up the page state
+  //? this pagestate contains the category of the blog to be shown
 
   //todo: modify this
-
   let categories = [
     "ai",
     "tech",
@@ -32,37 +34,51 @@ export default function HomePage() {
     "psychological"
   ];
 
-  useEffect(() => {
-    activeTabRef.current.click();
+  // const getBlogsByCategory = async ({ page = 1 }) => {
+  //   try {
+  //     const request = await axios.post("http://localhost:3000/search-blogs", {
+  //       tag: pageState,
+  //       page
+  //     });
 
-    if (pageState == "home") {
-      getLatestBlogs();
-    } else {
-      getBlogsByCategory(pageState);
-    }
+  //     const formatedData = await filterPaginationData({
+  //       state: blogs,
+  //       data: request.data.blogs,
+  //       page,
+  //       countRoute: "/search-blogs-count",
+  //       data_to_send: { tag: pageState }
+  //     });
 
-    if (!trendingBlogs) {
-      getTrendingBlogs();
-    }
-  }, [pageState]);
+  //     setBlogs(formatedData);
+  //   } catch (err) {
+  //     console.error("Error fetching blogs by category", err);
+  //     toast.error("Error fetching blogs by category: " + pageState);
+  //   }
+  // };
 
-  const getBlogsByCategory = async (category) => {
+  const getBlogsByCategory = async ({ page = 1 }) => {
     try {
       const request = await axios.post("http://localhost:3000/search-blogs", {
-        category: pageState
+        category: pageState, // ✅ Changed from `tag`
+        page: Number(page) || 1 // ✅ Ensure it's a number
       });
 
-      const reqData = await request.data.blogs;
+      const formatedData = await filterPaginationData({
+        state: blogs,
+        data: request.data.blogs,
+        page,
+        countRoute: "/search-blogs-count",
+        data_to_send: { category: pageState } // ✅ Ensure consistency
+      });
 
-      setBlogs(reqData);
-      console.log("blogsArray => ", reqData); // show value after first render
+      setBlogs(formatedData);
     } catch (err) {
-      console.error("Error fetching blogs by category", err);
-      toast.error("Error fetching blogs by category: " + category);
+      console.error("Error fetching blogs by category:", err);
+      toast.error("Error fetching blogs by category: " + pageState);
     }
   };
 
-  const getLatestBlogs = async (page = 1) => {
+  const getLatestBlogs = async ({ page = 1 }) => {
     // use this funciton in useEffect to get latest blogs
     try {
       const latestBlog = await axios.post("http://localhost:3000/latest-blogs", { page });
@@ -74,9 +90,8 @@ export default function HomePage() {
         countRoute: "/all-latest-blogs-count"
       });
 
+      console.log("Formatted blogs ==>> ", formatedData);
       setBlogs(formatedData); //! blog from backend is stored to useState form here
-      // console.log("blogsArray => ", blogsArray);
-      // console.log("blogsArray => ", blogs); // show value after first render
     } catch (err) {
       console.error("Error fetching latest blogs", err);
     }
@@ -94,12 +109,10 @@ export default function HomePage() {
     }
   };
 
-  //! start from here
   const filterBlogsByCategory = (e) => {
     let category = e.target.innerText.toLowerCase();
 
     setBlogs(null); //todo
-
     if (pageState == category) {
       setPageState("home");
       return;
@@ -107,6 +120,21 @@ export default function HomePage() {
 
     setPageState(category);
   };
+
+  useEffect(() => {
+    activeTabRef.current.click();
+
+    if (pageState == "home") {
+      getLatestBlogs({ page: 1 });
+    } else {
+      getBlogsByCategory({ page: 1 });
+    }
+
+    if (!trendingBlogs) {
+      getTrendingBlogs();
+    }
+  }, [pageState]);
+
   return (
     <AnimationWrapper>
       <section className="h-cover flex justify-center gap-10">
@@ -129,6 +157,10 @@ export default function HomePage() {
               ) : (
                 <NaMsgData message={"No blog found"} />
               )}
+              <LoadMoreDataBtn
+                state={blogs}
+                fetchDataFn={pageState == "home" ? getLatestBlogs : getBlogsByCategory}
+              />
             </>
 
             {trendingBlogs == null ? (
