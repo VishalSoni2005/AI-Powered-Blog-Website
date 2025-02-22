@@ -23,10 +23,6 @@ export default function AuthForm({ type }) {
     try {
       const response = await axios.post(`http://localhost:3000${route}`, data);
 
-      // DEBUG
-      // console.log("Request made to:", route);
-      // console.log("Server response:", response.data);
-
       if (!response.data || !response.data.access_token) {
         throw new Error("Invalid server response: Missing access token");
       }
@@ -35,19 +31,18 @@ export default function AuthForm({ type }) {
 
       //! note user is stored in session
       storeInSession("user", JSON.stringify(userData));
-      
+
       // Update user auth state
       setUserAuth(userData);
-      
-      /*  //* note  user data contains: 
-        *  return {
-        * access_token,
-        * profile_img: user.personal_info.profile_img,
-        * fullname: user.personal_info.fullname,
-        * username: user.personal_info.username
-        * };
-        */
-      // Show success notification
+
+      /*  //* note  user data contains:
+       *  return {
+       * access_token,
+       * profile_img: user.personal_info.profile_img,
+       * fullname: user.personal_info.fullname,
+       * username: user.personal_info.username
+       * };
+       */
       toast.success("Authentication successful");
     } catch (error) {
       console.error("Authentication Error:", error);
@@ -104,10 +99,9 @@ export default function AuthForm({ type }) {
     e.preventDefault();
     authWithGoogle()
       .then((user) => {
-
         const accessToken = user.accessToken;
         console.log("User from google auth => ", user);
-        
+
         let serverRoute = "/google-auth";
         let formData = {
           access_token: accessToken

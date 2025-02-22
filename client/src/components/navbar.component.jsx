@@ -1,9 +1,9 @@
 import React, { useContext, useState } from "react";
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useNavigate } from "react-router-dom";
 import Logo from "../imgs/logo.png";
 // import logoTwo from '../imgs/pen.svg';
 
-import logoTwo from '../imgs/blog.svg';
+import logoTwo from "../imgs/blog.svg";
 
 import { UserContext } from "../App";
 import UserNavigationPanel from "./user-navigation.component";
@@ -12,9 +12,10 @@ import defaultAvatar from "../imgs/user.png";
 export default function Navbar() {
   const [searchBoxVisibility, setSearchBoxVisibility] = useState(false);
   const [navPanel, setNavPanel] = useState(false);
+  let navigate = useNavigate();
 
   const handleUserNavPanel = () => {
-    setNavPanel(prev => !prev);
+    setNavPanel((prev) => !prev);
   };
 
   const handleBlur = () => {
@@ -23,8 +24,16 @@ export default function Navbar() {
 
   const {
     userAuth,
-    userAuth: { access_token, profile_img },
+    userAuth: { access_token, profile_img }
   } = useContext(UserContext);
+
+  const handleSearch = (e) => {
+    const query = e.target.value;
+    if ( e.keyCode === 13 && query.length) {
+      console.log(query);
+      navigate(`/search/${query}`);
+    }
+  };
 
   return (
     <>
@@ -33,7 +42,9 @@ export default function Navbar() {
           <img src={logoTwo} alt="Logo" />
         </Link>
 
-        <p className=" -translate-x-6 font-gelasio text-2xl hidden md:block transform-gpu duration-150 ">Vishal Writes</p>
+        <p className="font-gelasio hidden -translate-x-6 transform-gpu text-2xl duration-150 md:block">
+          Vishal Writes
+        </p>
 
         {/* Search Bar */}
         <div
@@ -41,6 +52,7 @@ export default function Navbar() {
             searchBoxVisibility ? "hide" : "show"
           }`}>
           <input
+            onKeyDown={handleSearch}
             type="text"
             placeholder="Search"
             className="bg-grey placeholder:text-dark-grey w-full rounded-full p-4 pl-6 pr-[12px] md:w-auto md:pl-12 md:pr-6"

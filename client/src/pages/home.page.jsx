@@ -59,8 +59,8 @@ export default function HomePage() {
   const getBlogsByCategory = async ({ page = 1 }) => {
     try {
       const request = await axios.post("http://localhost:3000/search-blogs", {
-        category: pageState, // ✅ Changed from `tag`
-        page: Number(page) || 1 // ✅ Ensure it's a number
+        category: pageState,    // ✅ 
+        page: Number(page) || 1 // ✅ 
       });
 
       const formatedData = await filterPaginationData({
@@ -68,7 +68,7 @@ export default function HomePage() {
         data: request.data.blogs,
         page,
         countRoute: "/search-blogs-count",
-        data_to_send: { category: pageState } // ✅ Ensure consistency
+        data_to_send: { category: pageState } // ✅ 
       });
 
       setBlogs(formatedData);
