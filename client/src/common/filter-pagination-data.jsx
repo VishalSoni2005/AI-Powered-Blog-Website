@@ -2,8 +2,8 @@ import axios from "axios";
 
 export const filterPaginationData = async ({
   createNewArray = false,
-  state,
-  data,
+  state, // {results:[],page:1,totalDocs:0}
+  data, // array of blog object come from post request
   page,
   arr,
   countRoute,

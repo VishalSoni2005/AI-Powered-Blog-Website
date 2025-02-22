@@ -1,9 +1,12 @@
 const LoadMoreDataBtn = ({ state, fetchDataFn }) => {
   if (state != null && state.totalDocs > state.results.length) {
+
+    {/* //! page number is changed from this component */}
+    
     return (
       <button
         className="text-dark-grey hover:bg-gery/30 flex items-center gap-2 p-2 px-3"
-        onClick={() => fetchDataFn({ page: state.page + 1 })}>
+        onClick={() => fetchDataFn({ page: state.page + 1 })}> 
         Load More
       </button>
     );

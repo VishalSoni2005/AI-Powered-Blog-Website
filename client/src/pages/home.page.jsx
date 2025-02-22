@@ -11,7 +11,7 @@ import LoadMoreDataBtn from "../components/load-more.component";
 
 export default function HomePage() {
   let [blogs, setBlogs] = useState(null); //todo: note this blog contain blog data in format as:
-  //* {results:[],page:1,totalDocs:0}
+  //* blogs: {results:[],page:1,totalDocs:0}
   let [trendingBlogs, setTrendingBlogs] = useState(null);
   let [pageState, setPageState] = useState("home"); //* setting up the page state
   //? this pagestate contains the category of the blog to be shown
@@ -59,16 +59,18 @@ export default function HomePage() {
   const getBlogsByCategory = async ({ page = 1 }) => {
     try {
       const request = await axios.post("http://localhost:3000/search-blogs", {
-        category: pageState,    // ✅ 
-        page: Number(page) || 1 // ✅ 
+        category: pageState, // ✅
+        page: Number(page) || 1 // ✅
       });
+
+      //* request.data.blogs is an  [ {} _ {} ]      
 
       const formatedData = await filterPaginationData({
         state: blogs,
         data: request.data.blogs,
         page,
         countRoute: "/search-blogs-count",
-        data_to_send: { category: pageState } // ✅ 
+        data_to_send: { category: pageState } // ✅
       });
 
       setBlogs(formatedData);
@@ -157,10 +159,13 @@ export default function HomePage() {
               ) : (
                 <NaMsgData message={"No blog found"} />
               )}
+
+              {/* //! complex component  */}
               <LoadMoreDataBtn
                 state={blogs}
                 fetchDataFn={pageState == "home" ? getLatestBlogs : getBlogsByCategory}
               />
+              {/* //* above LoadMoreDataBtn will change the page number */}
             </>
 
             {trendingBlogs == null ? (
