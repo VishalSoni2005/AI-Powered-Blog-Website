@@ -230,6 +230,8 @@ export const searchBlogs = async (req, res) => {
       .skip((page - 1) * maxLimit)
       .limit(maxLimit);
 
+    console.log("blogs from search blog api -> ", blogs);
+
     res.status(200).json({
       message: "Success",
       blogs
@@ -277,6 +279,29 @@ export const searchBlogsCountForCategory = async (req, res) => {
     return res.status(500).json({
       message: "Internal server error",
       note: "Error in search blog count request"
+    });
+  }
+};
+
+export const searchUsers = async (req, res) => {
+  try {
+    let { query } = req.body;
+    const users = await User.find({
+      "personal_info.username": new RegExp(query, "i") //? searching for all docs have search query
+    })
+      .limit(50)
+      .select(
+        "personal_info.username personal_info.fullname personal_info.profile_img -_id"
+      );
+
+    res.status(200).json({
+      message: "Success",
+      users
+    });
+  } catch (err) {
+    return res.status(500).json({
+      message: "Internal server error",
+      note: "Error in search user request"
     });
   }
 };

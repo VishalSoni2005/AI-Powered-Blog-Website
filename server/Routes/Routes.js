@@ -7,6 +7,7 @@ import {
   latestBlogs,
   searchBlogs,
   searchBlogsCountForCategory,
+  searchUsers,
   trendingBlogs
 } from "../Controller/BlogRoutes.js";
 import { verifyJWT } from "../Middlewares/VerifyJWT.js";
@@ -22,12 +23,15 @@ router.post("/google-auth", googleAuth);
 router.post("/upload", uploadBanner);
 
 // Blog route
+router.get("/trending-blogs", trendingBlogs);
 router.post("/create-blog", verifyJWT, CreateBlog);
 router.post("/search-blogs", searchBlogs);
 router.post("/latest-blogs", latestBlogs);
-router.get("/trending-blogs", trendingBlogs);
 
+// blog search users
+router.post("/search-users", searchUsers);
 
+// Blog count routes
 router.post("/all-latest-blogs-count", countLatestBlogs);
 router.post("/search-blogs-count", searchBlogsCountForCategory);
 
