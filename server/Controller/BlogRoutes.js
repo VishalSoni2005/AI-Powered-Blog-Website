@@ -207,19 +207,17 @@ export const trendingBlogs = async (req, res) => {
 //   }
 // };
 
-
 export const searchBlogs = async (req, res) => {
   try {
-    let { category, page = 1 } = req.body;
+    let { query, category, page = 1 } = req.body;
 
-    if (!category) {
-      return res.status(400).json({
-        message: "Bad Request",
-        note: "Category (tag) is required"
-      });
+    let findQuery;
+    if (category) {
+      findQuery = { tags: { $in: [category.toLowerCase()] }, draft: false };
+    } else if (query) {
+      findQuery = { title: new RegExp(query, "i"), draft: false }; //TODO: to check any key word is included in titile or not
     }
 
-    let findQuery = { tags: { $in: [category.toLowerCase()] }, draft: false };
     let maxLimit = 2;
 
     const blogs = await Blog.find(findQuery)
@@ -262,8 +260,14 @@ export const countLatestBlogs = async (req, res) => {
 
 export const searchBlogsCountForCategory = async (req, res) => {
   try {
-    let { tag } = req.body;
-    let findQuery = { tags: tag, draft: false };
+    let { tag, query } = req.body;
+
+    let findQuery;
+    if (tag) {
+      findQuery = { tags: tag, draft: false };
+    } else if (query) {
+      findQuery = { title: new RegExp(query, "i"), draft: false }; //TODO: to check any key word is included in titile or not
+    }
     const count = await Blog.countDocuments(findQuery);
     res.status(200).json({
       message: "Success",
