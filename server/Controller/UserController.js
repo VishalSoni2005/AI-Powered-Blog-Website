@@ -1,4 +1,4 @@
-import User from "../Schema/User";
+import User from "../Schema/User.js";
 
 export const getProfile = async (req, res) => {
   try {
@@ -13,13 +13,6 @@ export const getProfile = async (req, res) => {
     const user = await User.findOne({
       "personal_info.username": username
     }).select("-personal_info.password -google_auth -updatedAt -blogs");
-
-    // if (!user) {
-    //   return res.status(404).json({
-    //     message: "User not found",
-    //     user: null  //! potential error
-    //   });
-    // }
 
     return res.status(200).json(user);
   } catch (err) {

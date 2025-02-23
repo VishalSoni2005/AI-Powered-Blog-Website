@@ -26,39 +26,6 @@ export const CreateBlog = async (req, res) => {
       });
     }
 
-    // //* buggy code
-    // if (!draft) {
-    //   if (!title || !des) {
-    //     return res.status(400).json({
-    //       message: "Bad Request",
-    //       note: "Please fill all the fields"
-    //     });
-    //   }
-    //   if (!banner.length) {
-    //     return res.status(400).json({
-    //       message: "Bad Request",
-    //       note: "Please upload a banner image"
-    //     });
-    //   }
-
-    //   //* content is object generated from editorjs.
-    //   //* content object contain block array
-    //   if (!content.blocks.length) {
-    //     //!error expected
-    //     return res.status(400).json({
-    //       message: "Bad Request",
-    //       note: "Please write some content"
-    //     });
-    //   }
-
-    //   if (!tags.length) {
-    //     return res.status(400).json({
-    //       message: "Bad Request",
-    //       note: "Please add tags"
-    //     });
-    //   }
-    // }
-
     //* optimaized code
     if (!draft) {
       if (!des || !banner || !content?.blocks?.length || !tags?.length) {
@@ -209,13 +176,15 @@ export const trendingBlogs = async (req, res) => {
 
 export const searchBlogs = async (req, res) => {
   try {
-    let { query, category, page = 1 } = req.body;
+    let { query, author, category, page = 1 } = req.body;
 
     let findQuery;
     if (category) {
       findQuery = { tags: { $in: [category.toLowerCase()] }, draft: false };
     } else if (query) {
       findQuery = { title: new RegExp(query, "i"), draft: false }; //TODO: to check any key word is included in titile or not
+    } else if(author) {
+      findQuery = { author, draft: false };
     }
 
     let maxLimit = 2;
@@ -262,13 +231,15 @@ export const countLatestBlogs = async (req, res) => {
 
 export const searchBlogsCountForCategory = async (req, res) => {
   try {
-    let { tag, query } = req.body;
+    let { author, tag, query } = req.body;
 
     let findQuery;
     if (tag) {
       findQuery = { tags: tag, draft: false };
     } else if (query) {
       findQuery = { title: new RegExp(query, "i"), draft: false }; //TODO: to check any key word is included in titile or not
+    } else if (author) {
+      findQuery = { author, draft: false };
     }
     const count = await Blog.countDocuments(findQuery);
     res.status(200).json({
