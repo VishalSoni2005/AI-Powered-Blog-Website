@@ -10,6 +10,7 @@ import {
   searchUsers,
   trendingBlogs
 } from "../Controller/BlogRoutes.js";
+import { getProfile } from "../Controller/UserController.js";
 import { verifyJWT } from "../Middlewares/VerifyJWT.js";
 
 const router = express.Router();
@@ -34,5 +35,8 @@ router.post("/search-users", searchUsers);
 // Blog count routes
 router.post("/all-latest-blogs-count", countLatestBlogs);
 router.post("/search-blogs-count", searchBlogsCountForCategory);
+
+// User routes
+router.post("/get-profile", getProfile);
 
 export default router;
