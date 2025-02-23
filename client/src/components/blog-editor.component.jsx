@@ -156,7 +156,7 @@ export default function BlogEditor() {
         banner,
         draft: true,
       };
-
+      //! this is authorization header
       await axios.post("http://localhost:3000/create-blog", blogObject, {
         headers: {
           Authorization: `Bearer ${access_token}`,

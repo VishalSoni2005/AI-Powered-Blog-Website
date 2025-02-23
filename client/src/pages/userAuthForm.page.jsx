@@ -82,7 +82,6 @@ export default function AuthForm({ type }) {
       return toast.error("Please fill in all fields");
     }
 
-    //todo
     if (!emailRegex.test(email)) {
       return toast.error("Invalid email format");
     }
