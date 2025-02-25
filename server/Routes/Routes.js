@@ -12,6 +12,7 @@ import {
 } from "../Controller/BlogRoutes.js";
 import { getProfile } from "../Controller/UserController.js";
 import { verifyJWT } from "../Middlewares/VerifyJWT.js";
+import { BlogPage } from "../Controller/BlogPage.js";
 
 const router = express.Router();
 
@@ -38,5 +39,8 @@ router.post("/search-blogs-count", searchBlogsCountForCategory);
 
 // User routes
 router.post("/get-profile", getProfile);
+
+// Blog page Route
+router.post("/get-blog", BlogPage)
 
 export default router;
