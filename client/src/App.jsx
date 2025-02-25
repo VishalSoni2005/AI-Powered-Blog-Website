@@ -8,6 +8,7 @@ import HomePage from "./pages/home.page";
 import SearchPage from "./pages/search.page";
 import NotFound from "./pages/404.page";
 import ProfilePage from "./pages/profile.page";
+import BlogPage from "./pages/blog.page";
 
 export const UserContext = createContext({});
 //* userContext contain access_token, username, fullname, profile_img
@@ -29,6 +30,7 @@ const App = () => {
           <Route path="signup" element={<AuthForm type="sign-up" />} />
           <Route path="search/:query" element={<SearchPage />} /> {/* //!for dynamic routing */}
           <Route path="user/:id" element={<ProfilePage />} />
+          <Route path="blog/:blog_id" element={<BlogPage />} />
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
