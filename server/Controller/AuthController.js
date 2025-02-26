@@ -32,9 +32,6 @@ const generateUsername = async (email) => {
   return username;
 };
 
-// eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3YjFkNjhhM2JiMjFiZDk4MzBhMWEzYiIsImlhdCI6MTczOTcwODA0MiwiZXhwIjoxNzM5Nzk0NDQyfQ.uwFXDX2nHqp6zTIjDij7oOqWkdW9zDZwBHgOibtM9wI;
-
-// Format data to send
 const formatDataToSend = (user) => {
   const access_token = jwt.sign({ id: user._id }, process.env.SECRET_KEY, {
     expiresIn: "1d"
@@ -58,18 +55,17 @@ export const signup = async (req, res) => {
         .json({ success: false, message: "Please fill all the fields" });
     }
 
-    // todo
-    // if (!emailRegex.test(email)) {
-    //   return res.status(400).json({ success: false, message: "Invalid email format" });
-    // }
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ success: false, message: "Invalid email format" });
+    }
 
-    // if (!passwordRegex.test(password)) {
-    //   return res.status(400).json({
-    //     success: false,
-    //     message:
-    //       "Password must be at least 6 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*?&).",
-    //   });
-    // }
+    if (!passwordRegex.test(password)) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Password must be at least 6 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*?&).",
+      });
+    }
 
     // Check if user already exists
     const existingUser = await User.findOne({ "personal_info.email": email });
@@ -160,71 +156,6 @@ export const signin = async (req, res) => {
     });
   }
 };
-
-// export const googleAuth = async (req, res) => {
-//   let { access_token } = req.body;
-
-//   getAuth()
-//     .verifyIdToken(access_token)
-//     .then(async (decodedUser) => {
-//       let { email, name, picture } = decodedUser;
-
-//       picture = picture.replace("s96-c", "s384-c");
-
-//       let user = await User.findOne({ "personal_info.email": email })
-//         .select(
-//           "personal_info.fullname personal_info.username personal_info.profile_img google_auth"
-//         )
-//         .then((u) => {
-//           return u || null;
-//         })
-//         .catch((err) => {
-//           return res.status(500).json({
-//             note: "Error in server google_auth controller : " + err.message,
-//             message: "Server Error, Unable to process request"
-//           });
-//         });
-//       if (user) {
-//         if (!user.google_auth) {
-//           return res.status(403).json({
-//             note: "User already registered with a different method",
-//             message: "User already registered with a different method"
-//           });
-//         }
-//       } else {
-//         let username = await generateUsername(email);
-//         user = new User({
-//           personal_info: {
-//             fullname: name,
-//             email,
-//             username
-//           },
-//           google_auth: true
-//         });
-
-//         await user
-//           .save()
-//           .then((u) => {
-//             user = u;
-//           })
-//           .catch((err) => {
-//             return res.status(500).json({
-//               note:
-//                 "Error in server google_auth controller {1} : " + err.message,
-//               message: "Server Error, Unable to process request"
-//             });
-//           });
-
-//         return res.status(200).json(formatDataToSend(user));
-//       }
-//     })
-//     .catch((err) => {
-//       return res.status(500).json({
-//         note: "Error in server google_auth controller {2} : " + err.message,
-//         message: "Server Error, Unable to process request"
-//       });
-//     });
-// };
 
 export const googleAuth = async (req, res) => {
   try {
