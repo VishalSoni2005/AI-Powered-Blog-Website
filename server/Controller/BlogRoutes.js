@@ -176,18 +176,22 @@ export const trendingBlogs = async (req, res) => {
 
 export const searchBlogs = async (req, res) => {
   try {
-    let { query, author, category, page = 1 } = req.body;
+    let { eliminate_blog, query, author, category, page = 1, limit } = req.body;
 
     let findQuery;
     if (category) {
-      findQuery = { tags: { $in: [category.toLowerCase()] }, draft: false };
+      findQuery = {
+        tags: { $in: [category.toLowerCase()] },
+        draft: false,
+        blog_id: { $ne: eliminate_blog }
+      };
     } else if (query) {
       findQuery = { title: new RegExp(query, "i"), draft: false }; //TODO: to check any key word is included in titile or not
-    } else if(author) {
+    } else if (author) {
       findQuery = { author, draft: false };
     }
 
-    let maxLimit = 2;
+    let maxLimit = limit ? limit : 2;
 
     const blogs = await Blog.find(findQuery)
       .populate(
