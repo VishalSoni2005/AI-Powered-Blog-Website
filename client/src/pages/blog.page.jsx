@@ -4,13 +4,13 @@ import AnimationWrapper from "../common/page-animation";
 import axios from "axios";
 import Loader from "../components/loader.component";
 import BlogInteraction from "../components/blog-interaction.component";
+import BlogPostCard from "../components/blog-post.component";
 
 export const blogStructure = {
   title: "",
   des: "",
   banner: "",
   content: [],
-  tags: [],
   author: { personal_info: { fullname, username: author_username, profile_img } },
   publishedAt: ""
 };
@@ -22,6 +22,8 @@ export default function BlogPage() {
 
   const [blog, setBlog] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const [similarBlogs, setsimilarBlogs] = useState(null);
 
   let {
     title,
@@ -36,10 +38,29 @@ export default function BlogPage() {
 
   const fetchBlog = () => {
     try {
-      const request = axios.post("http://localhost/3000/get-blog", { blog_id });
-      const data = request.data.blog;
-      setBlog(data);
-      setLoading(false);
+      // nested post requests
+      //! error expected
+      axios
+        .post("http://localhost/3000/get-blog", { blog_id })
+        .then(({ data: { blog } }) => {
+          setBlog(blog);
+
+          axios
+            .post("http://localhost/3000/search-blogs", {
+              tag: tags[0],
+              limie: 6,
+              eliminate_blog: blog_id
+            })
+            .then(({ data }) => {
+              setsimilarBlogs(data.blogs);
+              console.log(data.blogs);
+            });
+
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.error("Error fetching blog", error);
+        });
 
       console.log(data);
     } catch (error) {
@@ -48,8 +69,15 @@ export default function BlogPage() {
   };
 
   useEffect(() => {
+    resetstate();
     fetchBlog();
-  }, []);
+  }, [blog_id]);
+
+  const resetstate = () => {
+    setBlog(blogStructure);
+    setsimilarBlogs(null);
+    setLoading(true);
+  };
   return (
     <AnimationWrapper>
       {loading ? (
@@ -82,8 +110,25 @@ export default function BlogPage() {
 
             <BlogInteraction />
             {/* {Blog Content} */}
-            
+
             <BlogInteraction />
+
+            {similarBlogs != null && similarBlogs.length ? (
+              <>
+                <h1 className="mb-10 mt-14 text-2xl font-medium">Similar Blogs</h1>
+                {similarBlogs.map((blog, i) => {
+                  let {
+                    author: { personal_info }
+                  } = blog;
+
+                  return (
+                    <AnimationWrapper key={i} transition={{ duration: 1, delay: i * 0.1 }}>
+                      <BlogPostCard content={blog} author={personal_info} />
+                    </AnimationWrapper>
+                  );
+                })}
+              </>
+            ) : null}
           </div>
         </BlogContext.Provider>
       )}
