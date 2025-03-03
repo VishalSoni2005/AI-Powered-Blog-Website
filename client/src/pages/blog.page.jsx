@@ -37,6 +37,8 @@ export default function BlogPage() {
   } = blog;
 
   const fetchBlog = () => {
+
+    
     try {
       // nested post requests
       //! error expected
