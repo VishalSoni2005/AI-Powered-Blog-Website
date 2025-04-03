@@ -58,7 +58,7 @@ export const CreateBlog = async (req, res) => {
 
     await blog.save();
     const incrementVal = draft ? 0 : 1;
-
+ 
     await User.findOneAndUpdate(
       { _id: authId },
       {

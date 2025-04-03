@@ -63,7 +63,7 @@ export default function HomePage() {
         page: Number(page) || 1 // ✅
       });
 
-      //* request.data.blogs is an  [ {} _ {} ]      
+      //* request.data.blogs is an  [ {} _ {} ]
 
       const formatedData = await filterPaginationData({
         state: blogs,

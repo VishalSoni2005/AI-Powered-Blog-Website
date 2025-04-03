@@ -25,7 +25,7 @@ let profile_imgs_name_list = [
 let profile_imgs_collections_list = [
   "notionists-neutral",
   "adventurer-neutral",
-  // "fun-emoji"
+  "fun-emoji"
 ];
 
 const userSchema = mongoose.Schema(

@@ -1,5 +1,5 @@
-import Blog from '../Schema/Blog.js'
-import User from '../Schema/User.js'
+import Blog from "../Schema/Blog.js";
+import User from "../Schema/User.js";
 
 export const BlogPage = async (req, res) => {
   try {
@@ -8,14 +8,19 @@ export const BlogPage = async (req, res) => {
 
     const blog = await Blog.findOneAndUpdate(
       { blog_id },
-      { $inc: { "activity.total_reads": incrementVal } },
-      { new: true } // Ensure the updated document is returned
+      { $inc: { "activity.total_reads": incrementVal } }, // to increase author totol read count
+      { new: true }
     )
       .populate(
         "author",
         "personal_info.fullname personal_info.username personal_info.profile_img"
       )
       .select("title des content banner activity publishedAt blog_id tags");
+
+    // response from upper request will ve :
+    // { activity, _id, blog_id, tags, title, banner, content: [], des , author: {personal_info: {fullname, username, profile_pic}, _id}, publishedAt}
+
+   //  console.log("blog -> ", blog);
 
     if (!blog) {
       return res.status(404).json({ message: "Blog not found" });

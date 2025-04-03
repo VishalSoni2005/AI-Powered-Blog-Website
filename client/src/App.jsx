@@ -26,11 +26,12 @@ const App = () => {
         <Route path="/editor" element={<Editor />} />
         <Route path="/" element={<Navbar />}>
           <Route index element={<HomePage />} />
-          <Route path="signin" element={<AuthForm type="sign-in" />} />
-          <Route path="signup" element={<AuthForm type="sign-up" />} />
-          <Route path="search/:query" element={<SearchPage />} /> {/* //!for dynamic routing */}
-          <Route path="user/:id" element={<ProfilePage />} />
-          <Route path="blog/:blog_id" element={<BlogPage />} />
+          <Route path="/signin" element={<AuthForm type="sign-in" />} />
+          <Route path="/signup" element={<AuthForm type="sign-up" />} />
+          <Route path="/search/:query" element={<SearchPage />} /> {/* //!for dynamic routing */}
+          <Route path="/user/:id" element={<ProfilePage />} />
+          <Route path="/blog/:blog_id" element={<h1>al;skdjf;alsdkhjf</h1>} />
+          {/* <Route path="/blog/:blog_id" element={<BlogPage />} /> */}
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>

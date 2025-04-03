@@ -6,6 +6,7 @@ import {
   CreateBlog,
   latestBlogs,
   searchBlogs,
+  // searchBlogs,
   searchBlogsCountForCategory,
   searchUsers,
   trendingBlogs
@@ -13,6 +14,7 @@ import {
 import { getProfile } from "../Controller/UserController.js";
 import { verifyJWT } from "../Middlewares/VerifyJWT.js";
 import { BlogPage } from "../Controller/BlogPage.js";
+
 
 const router = express.Router();
 

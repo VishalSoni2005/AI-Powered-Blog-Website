@@ -1,7 +1,8 @@
 import React, { createContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import AnimationWrapper from "../common/page-animation";
 import axios from "axios";
+import AnimationWrapper from "../common/page-animation";
+
 import Loader from "../components/loader.component";
 import BlogInteraction from "../components/blog-interaction.component";
 import BlogPostCard from "../components/blog-post.component";
@@ -11,7 +12,14 @@ export const blogStructure = {
   des: "",
   banner: "",
   content: [],
-  author: { personal_info: { fullname, username: author_username, profile_img } },
+  tags: [],
+
+  activity: { personal_info: {}},
+
+
+  author: { personal_info: { fullname, username, profile_img } },
+
+
   publishedAt: ""
 };
 
@@ -20,14 +28,13 @@ export const BlogContext = createContext({});
 export default function BlogPage() {
   let { blog_id } = useParams();
 
-  const [blog, setBlog] = useState(null);
+  const [blog, setBlog] = useState(blogStructure);  // note initial value of blog is set as blogStructure coz it will be used in useEffect 
   const [loading, setLoading] = useState(true);
 
   const [similarBlogs, setsimilarBlogs] = useState(null);
 
   let {
     title,
-    des,
     banner,
     content,
     author: {
@@ -36,48 +43,41 @@ export default function BlogPage() {
     publishedAt
   } = blog;
 
-  const fetchBlog = () => {
+  const fetchBlog = async () => {
     try {
-      // nested post requests
-      //! error expected
-      axios
-        .post("http://localhost/3000/get-blog", { blog_id })
-        .then(({ data: { blog } }) => {
-          setBlog(blog);
+      setLoading(true);
 
-          axios
-            .post("http://localhost/3000/search-blogs", {
-              tag: tags[0],
-              limie: 6,
-              eliminate_blog: blog_id
-            })
-            .then(({ data }) => {
-              setsimilarBlogs(data.blogs);
-              console.log(data.blogs);
-            });
+      const {
+        data: { blog }
+      } = await axios.post("http://localhost:3000/get-blog", { blog_id });
 
-          setLoading(false);
-        })
-        .catch((error) => {
-          console.error("Error fetching blog", error);
-        });
+      // console.log("Blog fetched -> ", blog); //! debug
 
-      console.log(data);
+      setBlog(blog);
+
+      const { data } = await axios.post("http://localhost:3000/search-blogs", {
+        tag: blog.tags?.[0] || "",
+        limit: 6,
+        eliminate_blog: blog_id
+      });
+
+      setsimilarBlogs(data.blogs);
     } catch (error) {
-      console.error(error);
+      console.error("Error fetching blog:", error);
+    } finally {
+      setLoading(false);
     }
   };
-
-  useEffect(() => {
-    resetstate();
-    fetchBlog();
-  }, [blog_id]);
 
   const resetstate = () => {
     setBlog(blogStructure);
     setsimilarBlogs(null);
     setLoading(true);
   };
+  useEffect(() => {
+    resetstate();
+    fetchBlog();
+  }, [blog_id]);
   return (
     <AnimationWrapper>
       {loading ? (
