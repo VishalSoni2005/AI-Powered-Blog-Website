@@ -25,8 +25,8 @@ export default function BlogPage() {
 
   const [blog, setBlog] = useState(blogStructure); // note initial value of blog is set as blogStructure coz it will be used in useEffect
   const [loading, setLoading] = useState(true);
-
   const [similarBlogs, setsimilarBlogs] = useState(null);
+  const [isLikedByUser, setLikeByUser] = useState(false);
 
   let {
     title,
@@ -76,7 +76,7 @@ export default function BlogPage() {
       {loading ? (
         <Loader />
       ) : (
-        <BlogContext.Provider value={{ blog, setBlog }}>
+        <BlogContext.Provider value={{ blog, setBlog, isLikedByUser, setLikeByUser }}>
           <div className="center max-w-[900px] py-10 max-lg:px-[5vw]">
             <img src={banner} className="aspect-video" alt="" />
 
