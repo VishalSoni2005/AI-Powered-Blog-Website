@@ -2,7 +2,8 @@ import React, { createContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import AnimationWrapper from "../common/page-animation";
-
+import { Link } from "react-router-dom";
+import BlogContent from "../components/blog-content.component";
 import Loader from "../components/loader.component";
 import BlogInteraction from "../components/blog-interaction.component";
 import BlogPostCard from "../components/blog-post.component";
@@ -13,13 +14,7 @@ export const blogStructure = {
   banner: "",
   content: [],
   tags: [],
-
-  activity: { personal_info: {}},
-
-
-  author: { personal_info: { fullname, username, profile_img } },
-
-
+  author: { personal_info: {} },
   publishedAt: ""
 };
 
@@ -27,8 +22,10 @@ export const BlogContext = createContext({});
 
 export default function BlogPage() {
   let { blog_id } = useParams();
+  console.log("Blog ID -> ", blog_id); //! debug
+  
 
-  const [blog, setBlog] = useState(blogStructure);  // note initial value of blog is set as blogStructure coz it will be used in useEffect 
+  const [blog, setBlog] = useState(blogStructure); // note initial value of blog is set as blogStructure coz it will be used in useEffect
   const [loading, setLoading] = useState(true);
 
   const [similarBlogs, setsimilarBlogs] = useState(null);
@@ -38,7 +35,7 @@ export default function BlogPage() {
     banner,
     content,
     author: {
-      personal_info: { fullname, username, profile_img }
+      personal_info: { fullname, username: author_username, profile_img }
     },
     publishedAt
   } = blog;
@@ -56,7 +53,7 @@ export default function BlogPage() {
       setBlog(blog);
 
       const { data } = await axios.post("http://localhost:3000/search-blogs", {
-        tag: blog.tags?.[0] || "",
+        tag: blog.tags[0] || "",
         limit: 6,
         eliminate_blog: blog_id
       });
@@ -96,6 +93,7 @@ export default function BlogPage() {
                   <p className="Capitalize">
                     {fullname}
                     <br />@
+                    {/* on clicking the below link it will redirect to user profile */}
                     <Link to={`/user/${author_username}`} className="text-dark-grey underline">
                       {author_username}
                     </Link>
@@ -109,7 +107,15 @@ export default function BlogPage() {
             </div>
 
             <BlogInteraction />
-            {/* {Blog Content} */}
+            <div className="my-12 font-gelasio blog-page-content">
+              {
+                content[0].blocks.map((block, i)  => {
+                  return <div key={i}  className="my-4 md:my-8">
+                    <BlogContent block={block} />
+                     </div>
+                })
+              }
+            </div> 
 
             <BlogInteraction />
 
