@@ -5,24 +5,29 @@ import { EditorContext } from "../pages/editor.pages";
 import { UserContext } from "../App";
 import Tags from "./tags.component";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 export default function PublishForm() {
+  let { blog_id } = useParams();
   let charLimit = 200;
   let tagLimit = 10;
-  let { userAuth: { access_token } } = useContext(UserContext);
+
+  let {
+    userAuth: { access_token }
+  } = useContext(UserContext);
+
   let {
     blog,
     blog: { banner, content, title, tags, des },
     setBlog,
-    editorState,  // by default editor
-    setEditorState,
+    editorState, // by default editor
+    setEditorState
   } = useContext(EditorContext);
 
-  //todo: this is blog object taken from editor context
+  //* this is blog object taken from editor context
   // const blog = {
   //   title: "",
-  //   banner: "", 
+  //   banner: "",
   //   content: [],
   //   tags: [],
   //   des: "",
@@ -144,6 +149,10 @@ export default function PublishForm() {
       toast.error("Please add at least one tag (Max 10)");
       return;
     }
+    if (!content || content.length === 0) {
+      toast.error("Blog content cannot be empty");
+      return;
+    }
 
     if (!banner) {
       toast.error("Please upload a banner image");
@@ -155,45 +164,27 @@ export default function PublishForm() {
     e.target.classList.add("disable");
 
     try {
-      // Fetch content from the editor
-      // const textEditor = window.editorInstance; // Ensure you have a reference to the editor
-      // if (!textEditor || !textEditor.isReady) {
-      //   toast.error("Editor is not ready. Try again.");
-      //   return;
-      // }
-
-      // const editorContent = await textEditor.save();
-      // if (!editorContent.blocks.length) {
-      //   toast.error("Blog content cannot be empty");
-      //   e.target.classList.remove("disable");
-      //   return;
-      // }
-
-
       let blogObject = {
         title,
         content: content,
         des,
         tags,
         banner,
-        draft: false,
+        draft: false
       };
       console.log(blogObject);
 
-
-      await axios.post("http://localhost:3000/create-blog", blogObject, {
-        headers: {
-          Authorization: `Bearer ${access_token}`,
-        },
-      });
-
-
+      await axios.post(
+        "http://localhost:3000/create-blog",
+        { ...blogObject, id: blog_id },
+        {
+          headers: {
+            Authorization: `Bearer ${access_token}`
+          }
+        }
+      );
 
       toast.dismiss(loadingToast);
-
-
-
-
       toast.success("Blog published successfully");
 
       setTimeout(() => {
@@ -203,9 +194,9 @@ export default function PublishForm() {
       e.target.classList.remove("disable");
       toast.dismiss(loadingToast);
       toast.error(error.response?.data?.msg || "Failed to publish the blog");
+      console.log("Error of publish form :", error);
     }
   };
-
 
   return (
     <AnimationWrapper>
@@ -215,7 +206,6 @@ export default function PublishForm() {
         <button
           onClick={handleClick}
           className="absolute right-[5vw] top-[5%] z-10 h-12 w-12 lg:top-[10%]">
-
           <i className="ff fi-br-cross"></i>
         </button>
 
@@ -250,10 +240,9 @@ export default function PublishForm() {
             {charLimit - des.length} Characters left
           </p>
 
-
           {/* //? tag section */}
           <p className="text-dark-grey mb-2 mt-9">
-            topics - ( Help us searching and ranking your blog post ){" "}
+            topics - ( Help us searching and ranking your blog post )
           </p>
           <div className="input-box relative py-2 pb-4 pl-2">
             <input
@@ -262,12 +251,10 @@ export default function PublishForm() {
               className="input-box sticky left-0 top-0 mb-3 bg-white pl-4 focus:bg-white"
               onKeyDown={handleTagKeyDown}
             />
-            {/* //todo: blunder happened use () not {}  */}
             {tags.map((tag, i) => (
               <Tags tag={tag} key={i} tagIndex={i} />
             ))}
           </div>
-
 
           <p className="text-dark-grey mb-4 mt-1 text-right text-sm">
             {tagLimit - tags.length} Tags left

@@ -46,3 +46,4 @@ router.post("/get-profile", getProfile);
 router.post("/get-blog", BlogPage)
 
 export default router;
+

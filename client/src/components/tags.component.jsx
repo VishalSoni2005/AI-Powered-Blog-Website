@@ -42,7 +42,7 @@ export default function Tags({ tag, tagIndex }) {
       <button
         className="absolute right-3 top-1/2 mt-[2px] -translate-y-1/2 rounded-full"
         onClick={handleTagDelete}>
-        <i class="fi fi-rr-cross pointer-events-none text-sm"></i>
+        <i className="fi fi-rr-cross pointer-events-none text-sm"></i>
       </button>
     </div>
   );

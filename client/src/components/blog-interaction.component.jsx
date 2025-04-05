@@ -31,20 +31,26 @@ export default function BlogInteraction() {
       <hr className="border-grey my-2" />
       <div className="flex justify-between gap-6">
         <div className="flex items-center gap-3">
+
+
           <button className="bg-grey/80 hover:bg-red/80 flex h-10 w-10 items-center justify-center rounded-full">
             <i className="fi fi-rr-heart"></i>
           </button>
+
+
           <p className="text-dark-grey text-xl">{total_likes}</p>
 
           <button className="bg-grey/80 hover:bg-red/80 flex h-10 w-10 items-center justify-center rounded-full">
             <i className="fi fi-rr-comment-dots"></i>
           </button>
+
+
           <p className="text-dark-grey text-xl">{total_comments}</p>
         </div>
 
         <div className="flex items-center gap-6">
           {username == author_username ? (
-            <Link to={`/editor/${blog_id}/${blog_id}`}>
+            <Link to={`/editor/${blog_id}`}>
               <i className="fi fi-rr-pencil hover:text-purple text-xl"></i>
             </Link>
           ) : (

@@ -22,8 +22,6 @@ export const BlogContext = createContext({});
 
 export default function BlogPage() {
   let { blog_id } = useParams();
-  console.log("Blog ID -> ", blog_id); //! debug
-  
 
   const [blog, setBlog] = useState(blogStructure); // note initial value of blog is set as blogStructure coz it will be used in useEffect
   const [loading, setLoading] = useState(true);
@@ -47,8 +45,6 @@ export default function BlogPage() {
       const {
         data: { blog }
       } = await axios.post("http://localhost:3000/get-blog", { blog_id });
-
-      // console.log("Blog fetched -> ", blog); //! debug
 
       setBlog(blog);
 
@@ -92,8 +88,7 @@ export default function BlogPage() {
                   <img src={profile_img} className="h-12 w-12 rounded-full" alt="" />
                   <p className="Capitalize">
                     {fullname}
-                    <br />@
-                    {/* on clicking the below link it will redirect to user profile */}
+                    <br />@{/* on clicking the below link it will redirect to user profile */}
                     <Link to={`/user/${author_username}`} className="text-dark-grey underline">
                       {author_username}
                     </Link>
@@ -107,15 +102,15 @@ export default function BlogPage() {
             </div>
 
             <BlogInteraction />
-            <div className="my-12 font-gelasio blog-page-content">
-              {
-                content[0].blocks.map((block, i)  => {
-                  return <div key={i}  className="my-4 md:my-8">
+            <div className="font-gelasio blog-page-content my-12">
+              {content[0].blocks.map((block, i) => {
+                return (
+                  <div key={i} className="my-4 md:my-8">
                     <BlogContent block={block} />
-                     </div>
-                })
-              }
-            </div> 
+                  </div>
+                );
+              })}
+            </div>
 
             <BlogInteraction />
 

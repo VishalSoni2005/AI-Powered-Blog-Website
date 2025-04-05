@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useRef } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import Logo from "../imgs/logo.png";
 import BlogBanner from "../imgs/blog banner.png";
 import AnimationWrapper from "../common/page-animation";
@@ -11,9 +11,14 @@ import { toast, Toaster } from "react-hot-toast";
 import { UserContext } from "../App";
 
 export default function BlogEditor() {
-  let { userAuth: { access_token } } = useContext(UserContext);
+  let {
+    userAuth: { access_token }
+  } = useContext(UserContext);
 
+  let navigate = useNavigate();
   let blogBannerRef = useRef();
+  const {blog_id} = useParams();
+
   let {
     blog,
     blog: { title, banner, content, tags, des },
@@ -24,15 +29,14 @@ export default function BlogEditor() {
     setEditorState
   } = useContext(EditorContext);
 
-  let navigate = useNavigate();
 
   useEffect(() => {
     if (!textEditor.isReady) {
       //? modified
       const editor = new EditorJs({
         holderId: "textEditor",
-        data: content,
-        tools: tools, // Pass the tools object here
+        data: Array.isArray(content) ? content[0] : content,
+        tools: tools, 
         placeholder: "Let's Share Your Story"
       });
 
@@ -46,14 +50,10 @@ export default function BlogEditor() {
     }
   }, []);
 
-  // todo;
   const handleBannerUpload = async (e) => {
     let file = e.target.files[0];
-    console.log("Image selected -> ", file);
 
     if (!file) return;
-
-    // Create FormData and append the file
     let formData = new FormData();
     formData.append("file", file);
 
@@ -61,13 +61,11 @@ export default function BlogEditor() {
       const response = await axios.post("http://localhost:3000/upload", formData);
 
       const data = await response.data;
-      console.log("Uploaded Image Data:", data);
-
       let imgUrl = data.url;
-      console.log("Uploaded Image URL +=>> ", imgUrl);
 
       if (imgUrl) {
         blogBannerRef.current.src = imgUrl;
+        toast.success("Image uploaded successfully");
       }
 
       // Update the blog banner URL in state
@@ -84,15 +82,12 @@ export default function BlogEditor() {
   };
 
   const handletitleChange = (e) => {
-    // console.log(e.target.value);
     let input = e.target;
 
     input.style.height = "auto";
     input.style.height = `${input.scrollHeight}px`;
 
     setBlog({ ...blog, title: input.value });
-    // console.log("blog -> ", blog); //! debugging
-    // console.log("blog title -> ", blog.title); //!
   };
 
   const handlePublishEvent = () => {
@@ -121,8 +116,6 @@ export default function BlogEditor() {
           console.error("Saving failed:", error);
         });
     }
-
-    // console.log("Now editor State ==>> ", editorState);
   };
 
   const handleSaveDraft = async (e) => {
@@ -154,13 +147,13 @@ export default function BlogEditor() {
         des,
         tags,
         banner,
-        draft: true,
+        draft: true
       };
       //! this is authorization header
-      await axios.post("http://localhost:3000/create-blog", blogObject, {
+      await axios.post("http://localhost:3000/create-blog", {...blogObject, id: blog_id}, {
         headers: {
-          Authorization: `Bearer ${access_token}`,
-        },
+          Authorization: `Bearer ${access_token}`
+        }
       });
 
       toast.dismiss(loadingToast);
@@ -176,8 +169,6 @@ export default function BlogEditor() {
       toast.error(error.response?.data?.error || "Unknown error occurred");
     }
   };
-
-
 
   // const handleSaveDraft = (e) => {
   //   if (e.target.className.includes("disable")) {
@@ -255,14 +246,14 @@ export default function BlogEditor() {
           <div className="mx-auto w-full max-w-[900px]">
             {/* //todo: banner div imporve image preview */}
 
-
             <div className="border-grey relative aspect-video border-4 bg-white hover:opacity-80">
               <label htmlFor="uploadBanner">
                 <img
-                  className="w-full h-full object-contain z-20 "
+                  className="z-20 h-full w-full object-contain"
                   ref={blogBannerRef}
-                  src={BlogBanner} alt="Blog Banner"
-                // className="z-20" //todo: classname modified
+                  src={BlogBanner}
+                  alt="Blog Banner"
+                  // className="z-20" //todo: classname modified
                 />
                 <input
                   type="file"
@@ -273,7 +264,6 @@ export default function BlogEditor() {
                 />
               </label>
             </div>
-
 
             {/*  title input field */}
             <textarea

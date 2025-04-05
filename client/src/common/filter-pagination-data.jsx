@@ -22,7 +22,7 @@ export const filterPaginationData = async ({
           page: 1,
           totalDocs
         };
-        console.log("Data after filtering:", obj);
+       // console.log("Data after filtering:", obj);
       })
       .catch((err) => console.log(err));
   }

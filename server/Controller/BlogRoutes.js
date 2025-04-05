@@ -3,21 +3,16 @@ import User from "../Schema/User.js";
 import { nanoid } from "nanoid";
 
 export const CreateBlog = async (req, res) => {
-  // only authenticated users can access this endpoint
-
   try {
     const authId = req.user;
-    let { title, des, tags, banner, content, draft } = req.body;
+    if (!authId) {
+      return res.status(401).json({
+        message: "Unauthorized",
+        note: "User authentication required"
+      });
+    }
 
-    //* this is req.body content
-    // let blogObject = {
-    //   title,
-    //   content: content,
-    //   des,
-    //   tags,
-    //   banner,
-    //   draft: false
-    // };
+    let { title, des, tags = [], banner, content, draft, id } = req.body;
 
     if (!title) {
       return res.status(400).json({
@@ -26,7 +21,6 @@ export const CreateBlog = async (req, res) => {
       });
     }
 
-    //* optimaized code
     if (!draft) {
       if (!des || !banner || !content?.blocks?.length || !tags?.length) {
         return res.status(400).json({
@@ -36,16 +30,47 @@ export const CreateBlog = async (req, res) => {
       }
     }
 
-    //* lowercasing all tags
-    tags = tags.map((i) => i.toLowerCase());
+    if (!Array.isArray(tags)) tags = [];
+    tags = tags.map((tag) => tag.toLowerCase());
 
-    //todo: creating dynamic blog id
-    const blogId = `${title
-      .replace(/[^a-zA-Z0-9]/g, " ")
-      .replace(/\s+/g, "-")
-      .trim()}-${nanoid(8)}`;
+    const blogId =
+      id ||
+      `${title
+        .replace(/[^a-zA-Z0-9]/g, " ")
+        .replace(/\s+/g, "-")
+        .trim()}-${nanoid(8)}`;
 
-    const blog = new Blog({
+    if (id) {
+      // learning : findOneAndUpdate will return the updated document only if {new: true} is passed in options
+      const updatedBlog = await Blog.findOneAndUpdate(
+        { blog_id: id },
+        {
+          $set: {
+            title,
+            des,
+            tags,
+            banner,
+            content,
+            draft: !!draft
+          }
+        },
+        { new: true } //💥
+      );
+
+      if (!updatedBlog) {
+        return res.status(404).json({
+          message: "Blog not found"
+        });
+      }
+
+      return res.status(201).json({
+        message: "Blog updated successfully",
+        data: updatedBlog,
+        id: updatedBlog.blog_id
+      });
+    }
+
+    const newBlog = new Blog({
       blog_id: blogId,
       title,
       banner,
@@ -53,26 +78,25 @@ export const CreateBlog = async (req, res) => {
       content,
       tags,
       author: authId,
-      draft: Boolean(draft)
+      draft: !!draft
     });
 
-    await blog.save();
+    await newBlog.save();
+
     const incrementVal = draft ? 0 : 1;
- 
-    await User.findOneAndUpdate(
-      { _id: authId },
-      {
-        $inc: { "account_info.total_posts": incrementVal },
-        $push: { blogs: blog._id }
-      }
-    );
 
-    res.status(201).json({
-      message: "Blog created successfully",
-      data: blog,
-      id: blog.blog_id
+    await User.findByIdAndUpdate(authId, {
+      $inc: { "account_info.total_posts": incrementVal },
+      $push: { blogs: newBlog._id }
     });
-  } catch (e) {
+
+    return res.status(201).json({
+      message: "Blog created successfully",
+      data: newBlog,
+      id: newBlog.blog_id
+    });
+  } catch (error) {
+    console.error("Error in CreateBlog:", error);
     return res.status(500).json({
       message: "Internal server error",
       note: "Error in Create Blog request"
@@ -143,37 +167,6 @@ export const trendingBlogs = async (req, res) => {
   }
 };
 
-//? seach blog according to tag
-// export const searchBlogs = async (req, res) => {
-//   try {
-//     let { category, page } = req.body; //! Debug
-
-//     let findQuery = { tags: category, draft: false };
-
-//     let maxLimit = 2;
-
-//     const blogs = await Blog.find(findQuery)
-//       .populate(
-//         "author",
-//         "personal_info.profile_img personal_info.username personal_info.fullname -_id"
-//       )
-//       .sort({ publishedAt: -1 })
-//       .select("blog_id title des banner activity tags publishedAt -_id")
-//       .skip((page - 1) * maxLimit)
-//       .limit(maxLimit);
-
-//     res.status(200).json({
-//       message: "Success",
-//       blogs
-//     });
-//   } catch (err) {
-//     return res.status(500).json({
-//       message: "Internal server error",
-//       note: "Error in search blog request"
-//     });
-//   }
-// };
-
 export const searchBlogs = async (req, res) => {
   try {
     let { eliminate_blog, query, author, category, page = 1, limit } = req.body;
@@ -203,7 +196,7 @@ export const searchBlogs = async (req, res) => {
       .skip((page - 1) * maxLimit)
       .limit(maxLimit);
 
-    console.log("blogs from search blog api -> ", blogs);
+    // console.log("blogs from search blog api -> ", blogs);
 
     res.status(200).json({
       message: "Success",
