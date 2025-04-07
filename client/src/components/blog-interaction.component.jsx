@@ -1,20 +1,18 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
 
 import { BlogContext } from "../pages/blog.page";
 import { UserContext } from "../App";
 import toast, { Toaster } from "react-hot-toast";
+import axios from "axios";
 
 export default function BlogInteraction() {
   let {
     blog,
     blog: {
+      _id,
       blog_id,
       title,
-      des,
-      banner,
-      content,
-      tags,
       activity,
       activity: { total_likes, total_reads, total_comments },
       author: {
@@ -37,6 +35,23 @@ export default function BlogInteraction() {
         !isLikedByUser ? total_likes++ : total_likes--;
 
         setBlog({ ...blog, activity: { ...activity, total_likes } });
+
+        const response = await axios.post(
+          "http://localhost:3000/like-blog",
+          {
+            _id,
+            isLikedByUser
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${access_token}`
+            }
+          }
+        );
+
+        const data = response.data;
+
+        console.log("data from backend: ", data);
       } else {
         toast.error("Please login to like the blog.");
       }
@@ -44,6 +59,29 @@ export default function BlogInteraction() {
       console.error("Error liking blog:", error);
     }
   };
+
+  useEffect(() => {
+    if (access_token) {
+      (async () => {
+        try {
+          const response = await axios.post(
+            "http://localhost:3000/isliked-by-user",
+            { _id },
+            {
+              headers: {
+                Authorization: `Bearer ${access_token}`
+              }
+            }
+          );
+
+          console.log("isLikedByUser: ", response.data);
+        } catch (err) {
+          console.error("Error checking like status:", err);
+        }
+      })(); //! <-- IIFE 
+    }
+  }, []);
+
   return (
     <>
       <Toaster position="top-right" reverseOrder={false} />
@@ -53,7 +91,7 @@ export default function BlogInteraction() {
           <button
             onClick={handleLikeClick}
             className={`bg-grey/80 hover:bg-red/80 flex h-10 w-10 items-center justify-center rounded-full ${isLikedByUser} ? "bg-red" : ""`}>
-            <i className={"fi " + (isLikedByUser ? "fi-rr-heart" : " fi-sr-heart")}></i>
+            <i className={"fi " + (isLikedByUser ? "fi-sr-heart" : " fi-rr-heart")}></i>
           </button>
 
           <p className="text-dark-grey text-xl">{total_likes}</p>
