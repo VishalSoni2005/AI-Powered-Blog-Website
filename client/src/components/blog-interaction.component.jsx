@@ -74,11 +74,13 @@ export default function BlogInteraction() {
             }
           );
 
-          console.log("isLikedByUser: ", response.data);
+          const result = response.data;
+          setLikeByUser(result);
+
         } catch (err) {
           console.error("Error checking like status:", err);
         }
-      })(); //! <-- IIFE 
+      })(); //! <-- IIFE
     }
   }, []);
 

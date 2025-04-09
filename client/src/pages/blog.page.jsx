@@ -27,6 +27,7 @@ export default function BlogPage() {
   const [loading, setLoading] = useState(true);
   const [similarBlogs, setsimilarBlogs] = useState(null);
   const [isLikedByUser, setLikeByUser] = useState(false);
+  const [commentsWrapper, setCommentsWrapper] = useState(false);
 
   let {
     title,
