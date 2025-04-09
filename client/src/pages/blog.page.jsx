@@ -7,6 +7,7 @@ import BlogContent from "../components/blog-content.component";
 import Loader from "../components/loader.component";
 import BlogInteraction from "../components/blog-interaction.component";
 import BlogPostCard from "../components/blog-post.component";
+import CommentContainer from "../components/comments.component";
 
 export const blogStructure = {
   title: "",
@@ -28,6 +29,7 @@ export default function BlogPage() {
   const [similarBlogs, setsimilarBlogs] = useState(null);
   const [isLikedByUser, setLikeByUser] = useState(false);
   const [commentsWrapper, setCommentsWrapper] = useState(false);
+  const [totolParentComponentsLoaded, setTotalParentComponentsLoaded] = useState(0); // this will hold current comment count for pagination issus
 
   let {
     title,
@@ -67,6 +69,9 @@ export default function BlogPage() {
     setBlog(blogStructure);
     setsimilarBlogs(null);
     setLoading(true);
+    setLikeByUser(false);
+    setCommentsWrapper(false);
+    setTotalParentComponentsLoaded(0);
   };
   useEffect(() => {
     resetstate();
@@ -77,7 +82,12 @@ export default function BlogPage() {
       {loading ? (
         <Loader />
       ) : (
-        <BlogContext.Provider value={{ blog, setBlog, isLikedByUser, setLikeByUser }}>
+        <BlogContext.Provider value={{ blog, setBlog, isLikedByUser, setLikeByUser, commentsWrapper, setCommentsWrapper, totolParentComponentsLoaded, setTotalParentComponentsLoaded }}>
+
+
+        <CommentContainer />
+
+
           <div className="center max-w-[900px] py-10 max-lg:px-[5vw]">
             <img src={banner} className="aspect-video" alt="" />
 

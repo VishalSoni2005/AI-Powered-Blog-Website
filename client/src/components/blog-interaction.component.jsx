@@ -21,7 +21,8 @@ export default function BlogInteraction() {
     },
     setBlog,
     isLikedByUser,
-    setLikeByUser
+    setLikeByUser,
+    setCommentsWrapper
   } = useContext(BlogContext);
 
   let {
@@ -76,7 +77,6 @@ export default function BlogInteraction() {
 
           const result = response.data;
           setLikeByUser(result);
-
         } catch (err) {
           console.error("Error checking like status:", err);
         }
@@ -98,7 +98,9 @@ export default function BlogInteraction() {
 
           <p className="text-dark-grey text-xl">{total_likes}</p>
 
-          <button className="bg-grey/80 hover:bg-red/80 flex h-10 w-10 items-center justify-center rounded-full">
+          <button
+            onClick={() => setCommentsWrapper((prev) => !prev)}
+            className="bg-grey/80 hover:bg-red/80 flex h-10 w-10 items-center justify-center rounded-full">
             <i className="fi fi-rr-comment-dots"></i>
           </button>
 

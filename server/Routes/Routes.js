@@ -13,8 +13,11 @@ import {
 import { getProfile } from "../Controller/UserController.js";
 import { verifyJWT } from "../Middlewares/VerifyJWT.js";
 import { BlogPage } from "../Controller/BlogPage.js";
-import { isLikedByUser, likeBlog } from "../Controller/LikeAndComment.js";
-
+import {
+  addComment,
+  isLikedByUser,
+  likeBlog
+} from "../Controller/LikeAndComment.js";
 
 const router = express.Router();
 
@@ -43,11 +46,12 @@ router.post("/search-blogs-count", searchBlogsCountForCategory);
 router.post("/get-profile", getProfile);
 
 // Blog page Route
-router.post("/get-blog", BlogPage)
+router.post("/get-blog", BlogPage);
 
 // like and comment routes
 router.post("/like-blog", verifyJWT, likeBlog);
-router.post('/isliked-by-user', verifyJWT, isLikedByUser)
+router.post("/isliked-by-user", verifyJWT, isLikedByUser);
+
+router.post("/add-comment", verifyJWT, addComment);
 
 export default router;
-
