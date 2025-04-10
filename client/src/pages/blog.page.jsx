@@ -7,7 +7,7 @@ import BlogContent from "../components/blog-content.component";
 import Loader from "../components/loader.component";
 import BlogInteraction from "../components/blog-interaction.component";
 import BlogPostCard from "../components/blog-post.component";
-import CommentContainer from "../components/comments.component";
+import CommentContainer, { fetchComments } from "../components/comments.component";
 
 export const blogStructure = {
   title: "",
@@ -49,6 +49,10 @@ export default function BlogPage() {
         data: { blog }
       } = await axios.post("http://localhost:3000/get-blog", { blog_id });
 
+      blog.comments = await fetchComments({
+        blog_id: blog_id,
+        setParentCommentCountFun: setTotalParentComponentsLoaded
+      });
       setBlog(blog);
 
       const { data } = await axios.post("http://localhost:3000/search-blogs", {
@@ -82,11 +86,18 @@ export default function BlogPage() {
       {loading ? (
         <Loader />
       ) : (
-        <BlogContext.Provider value={{ blog, setBlog, isLikedByUser, setLikeByUser, commentsWrapper, setCommentsWrapper, totolParentComponentsLoaded, setTotalParentComponentsLoaded }}>
-
-
-        <CommentContainer />
-
+        <BlogContext.Provider
+          value={{
+            blog,
+            setBlog,
+            isLikedByUser,
+            setLikeByUser,
+            commentsWrapper,
+            setCommentsWrapper,
+            totolParentComponentsLoaded,
+            setTotalParentComponentsLoaded
+          }}>
+          <CommentContainer />
 
           <div className="center max-w-[900px] py-10 max-lg:px-[5vw]">
             <img src={banner} className="aspect-video" alt="" />

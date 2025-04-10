@@ -1,6 +1,32 @@
 import React, { useContext } from "react";
 import { BlogContext } from "../pages/blog.page";
 import CommentFeild from "./comment-field.component";
+import axios from "axios";
+
+export const fetchComments = async ({
+  skip = 0,
+  blog_id,
+  setParentCommentCountFun,
+  comment_array = null
+}) => {
+  let res;
+
+  await axios
+    .post("http://localhost:3000/get-blog-comments", { blog_id, skip })
+    .then(({ data }) => {
+      data.map((comment) => {
+        comment.childrenLevel = 0;
+      });
+
+      setParentCommentCountFun((prev) => prev + data.length);
+
+      if (comment_arr == null) {
+        res = { results: data };
+      } else {
+        res = { results: [...comment_array, ...data] };
+      }
+    });
+};
 
 const CommentContainer = () => {
   let {
@@ -26,8 +52,7 @@ const CommentContainer = () => {
         </butto>
       </div>
 
-      <hr className="border-grey my-8 w-[120%] -ml-10 " />
-
+      <hr className="border-grey my-8 -ml-10 w-[120%]" />
 
       <CommentFeild action="comment" />
     </div>

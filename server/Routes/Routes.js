@@ -15,6 +15,7 @@ import { verifyJWT } from "../Middlewares/VerifyJWT.js";
 import { BlogPage } from "../Controller/BlogPage.js";
 import {
   addComment,
+  getBlogComments,
   isLikedByUser,
   likeBlog
 } from "../Controller/LikeAndComment.js";
@@ -53,5 +54,5 @@ router.post("/like-blog", verifyJWT, likeBlog);
 router.post("/isliked-by-user", verifyJWT, isLikedByUser);
 
 router.post("/add-comment", verifyJWT, addComment);
-
+router.post("/get-blog-comments", getBlogComments);
 export default router;

@@ -99,16 +99,43 @@ export const addComment = async (req, res) => {
       type: "comment",
       blog: _id,
       notification_for: blog_author,
-      user: user_id, 
+      user: user_id,
       comment: commentFile._id
     };
 
     new Notification(notificationObj).save().then((notification) => {
-     console.log("New Notification");
-     
-    })
+      console.log("New Notification");
+    });
+    return res
+      .status(200)
+      .json({ comment, commentedAt, _id: commentFile._id, user_id, children });
   } catch (error) {
     console.error("Error adding comment:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const getBlogComments = async (req, res) => {
+  try {
+    let { blog_id, skip } = req.body;
+
+    let maxLimit = 5;
+
+    Comment.find({ blog_id, isReply: false })
+      .populate(
+        "commented_by",
+        "personal_info.profile_img personal_info.username personal_info.fullname"
+      )
+      .skip(skip)
+      .limit(maxLimit)
+      .sort({
+        commentedAt: -1
+      })
+      .then((comments) => {
+        return res.status(200).json({ comments });
+      });
+  } catch (error) {
+    console.error("Error getting blog comments:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
