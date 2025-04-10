@@ -2,6 +2,9 @@ import React, { useContext } from "react";
 import { BlogContext } from "../pages/blog.page";
 import CommentFeild from "./comment-field.component";
 import axios from "axios";
+import NaMsgData from "./nodata.component";
+import AnimationWrapper from "../common/page-animation";
+import CommentCard from "./comment-card.component";
 
 export const fetchComments = async ({
   skip = 0,
@@ -30,10 +33,30 @@ export const fetchComments = async ({
 
 const CommentContainer = () => {
   let {
-    blog: { title },
+    blog,
+    setBlog,
+    blog: {
+      _id,
+      title,
+      comments: { results: commentsArr },
+      activity: { total_parent_comments }
+    },
     commentsWrapper,
-    setCommentsWrapper
+    setCommentsWrapper,
+    totalParentComponentsLoaded,
+    setTotalParentCommentsLoaded
   } = useContext(BlogContext);
+
+  const loadMoreComment = async () => {
+    let newCommentsArr = await fetchComments({
+      skip: totalParentComponentsLoaded,
+      blog_id: _id,
+      setParentCommentCountFun: setTotalParentCommentsLoaded,
+      comment_array: commentsArr
+    });
+
+    setBlog({ ...blog, comments: newCommentsArr });
+  };
   return (
     <div
       className={
@@ -55,6 +78,28 @@ const CommentContainer = () => {
       <hr className="border-grey my-8 -ml-10 w-[120%]" />
 
       <CommentFeild action="comment" />
+
+      {commentsArr && commentsArr.length ? (
+        commentsArr.map((comment, i) => {
+          return (
+            <AnimationWrapper key={i}>
+              <CommentCard index={i} leftVal={comment.childrenLevel * 4} commentData={comment} />
+            </AnimationWrapper>
+          );
+        })
+      ) : (
+        <NaMsgData message="No comments" />
+      )}
+
+      {total_parent_comments > totalParentComponentsLoaded ? (
+        <button
+          onClick={loadMoreComment}
+          className="text-dark-grey hover:bg-grey/30 flex items-center gap-2 rounded-md p-2 px-3">
+          Load More
+        </button>
+      ) : (
+        ""
+      )}
     </div>
   );
 };

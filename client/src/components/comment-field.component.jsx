@@ -13,6 +13,7 @@ const CommentFeild = ({ action }) => {
       _id,
       author: { _id: blog_author },
       comments,
+      comments: { results: commentsArr },
       activity,
       activity: { total_comments, total_parent_comments }
     },
@@ -58,7 +59,7 @@ const CommentFeild = ({ action }) => {
 
       data.childerLevel = 0; // used to define lvl of comments
 
-      newCommentArr = [data];
+      newCommentArr = [data, ...commentsArr];
 
       let parentCommentIncrement = 1;
 
