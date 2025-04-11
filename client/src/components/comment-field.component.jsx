@@ -57,11 +57,26 @@ const CommentFeild = ({ action, index = undefined, replyingTo = undefined, setRe
       // main comment array
       let newCommentArr;
 
-      data.childerLevel = 0; // used to define lvl of comments
+      if (replyingTo) {
+        commentsArr[index].children.push(data._id);
 
-      newCommentArr = [data, ...commentsArr];
+        data.childrenLevel = commentsArr[index].childerLevel + 1;
 
-      let parentCommentIncrement = 1;
+        data.parentIndex = index;
+
+        commentsArr[index].isReplyLoaded = true;
+
+        commentsArr.splice(index + 1, 0, data);
+
+        newCommentArr = [...commentsArr];
+
+        setReplying(false);
+      } else {
+        data.childerLevel = 0; // used to define lvl of comments
+        newCommentArr = [data, ...commentsArr];
+      }
+
+      let parentCommentIncrement = replyingTo ? 0 : 1;
 
       setBlog({
         ...blog,

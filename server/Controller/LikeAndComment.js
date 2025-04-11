@@ -73,14 +73,16 @@ export const addComment = async (req, res) => {
       return res.status(400).json({ message: "Comment cannot be empty" });
     }
 
-    let commentObj = new Comment({
+    let commentObj = {
       blog_id: _id,
       blog_author,
       comment,
       commented_by: user_id
-    });
+    };
 
-    commentObj.save().then((commentFile) => {
+    if (replying_to) commentObj.parent = replying_to;
+
+    new Comment(commentObj).save().then(async (commentFile) => {
       let { comment, commentedAt, children } = commentFile;
 
       Blog.findOneAndUpdate(
@@ -89,7 +91,7 @@ export const addComment = async (req, res) => {
           $push: { comments: commentFile._id },
           $inc: {
             "activity.total_comments": 1,
-            "activity.total_parent_comments": 1
+            "activity.total_parent_comments": replying_to ? 0 : 1
           }
         }
       ).then((blog) => {
@@ -98,12 +100,23 @@ export const addComment = async (req, res) => {
     });
 
     let notificationObj = {
-      type: "comment",
+      type: replying_to ? "reply" : "comment",
       blog: _id,
       notification_for: blog_author,
       user: user_id,
       comment: commentFile._id
     };
+
+    if (replying_to) {
+      notificationObj.replyied_on_comment = replying_to;
+
+      await Comment.findOneAndUpdate(
+        { _id: replying_to },
+        { $puch: { children: commentFile._id } }
+      ).then((replyToCommentDoc) => {
+        notificationObj.notification_for = replyToCommentDoc.commented_by;
+      });
+    }
 
     new Notification(notificationObj).save().then((notification) => {
       console.log("New Notification");

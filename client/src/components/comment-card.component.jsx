@@ -18,12 +18,43 @@ const CommentCard = ({ index, leftVal, commentData }) => {
     userAuth: { access_token }
   } = useContext(UserContext);
 
+  let {
+    blog,
+    setBlog,
+    blog: {
+      commetns: { results: commentsArr }
+    }
+  } = useContext(BlogContext);
+
   const handleReplyClick = () => {
     if (!access_token) {
       return toast.error("Login to reply");
     }
 
     setReplying((prev) => !prev);
+  };
+
+  const removeCommentsCards = (index) => {
+    if (commentsArr[index]) {
+      while (commentsArr[index].childrenLevel > commentData.childrenLevel) {
+        commmentsArr.splice(index, 1);
+        if (commentsArr[index]) {
+          break;
+        }
+      }
+    }
+
+    setBlog({ ...blog, comments: { results: commentsArr } });
+  };
+
+  const hideReplies = () => {
+    try {
+      commentData.isReplyLoaded = false;
+
+      removeCommentsCards(index + 1);
+    } catch (error) {
+      console.error("Error hiding replies:", error);
+    }
   };
   return (
     <div className="w-full" style={{ paddingLeft: `${leftVal * 10}px` }}>
@@ -40,6 +71,15 @@ const CommentCard = ({ index, leftVal, commentData }) => {
         <p className="font-galasio ml-3 text-xl">{comment}</p>
 
         <div className="mt-5 flex items-center gap-5">
+          {commentData.isReplyLoaded ? (
+            <button
+              onClick={hideReplies}
+              className="text-dark-grey hover:bg-grey/30 flex items-center gap-2 rounded-md p-2 px-3">
+              <i className="fi fi-rs-comment-dots"></i> Hide Reply
+            </button>
+          ) : (
+            ""
+          )}
           <button onClick={handleReplyClick} className="underline">
             Reply
           </button>
