@@ -2,6 +2,7 @@ import React, { useContext, useState } from "react";
 import { getDay } from "../common/date";
 import { UserContext } from "../App";
 import toast from "react-hot-toast";
+import CommentFeild from "./comment-field.component";
 
 const CommentCard = ({ index, leftVal, commentData }) => {
   const [isReplying, setReplying] = useState(false);
@@ -45,9 +46,13 @@ const CommentCard = ({ index, leftVal, commentData }) => {
         </div>
 
         {isReplying ? (
-          <div>
-            {/* CommentFeild */}
-            //!here 4 43
+          <div className="mt-8">
+            <CommentFeild
+              action={"reply"}
+              index={index}
+              setReplying={setReplying}
+              replyingTo={_id}
+            />
           </div>
         ) : (
           ""

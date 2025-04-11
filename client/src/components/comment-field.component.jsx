@@ -4,7 +4,7 @@ import toast, { Toaster } from "react-hot-toast";
 import axios from "axios";
 import { BlogContext } from "../pages/blog.page";
 
-const CommentFeild = ({ action }) => {
+const CommentFeild = ({ action, index = undefined, replyingTo = undefined, setReplying }) => {
   const [comment, setComment] = useState("");
 
   let {
@@ -41,7 +41,7 @@ const CommentFeild = ({ action }) => {
 
       const commentData = await axios.post(
         "http://localhost:3000/add-comment",
-        { _id, blog_author, comment },
+        { _id, blog_author, comment, replying_to: replyingTo },
         {
           headers: {
             Authorization: "Bearer " + access_token
