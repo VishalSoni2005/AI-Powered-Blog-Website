@@ -55,4 +55,6 @@ router.post("/isliked-by-user", verifyJWT, isLikedByUser);
 
 router.post("/add-comment", verifyJWT, addComment);
 router.post("/get-blog-comments", getBlogComments);
+router.post('/get-replies', get)
+
 export default router;
