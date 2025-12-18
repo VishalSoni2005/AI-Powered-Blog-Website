@@ -5,16 +5,18 @@ import { nanoid } from "nanoid";
 import "dotenv/config";
 
 //* * * * * * GOOGLE Auth * * * * * * \\
-import admin from "firebase-admin";
 import { getAuth } from "firebase-admin/auth";
-import { createRequire } from "module"; // this will allow us to use commonjs modules in modules type to access json file
-// direct importing json using module type is not allowed in type module
-const require = createRequire(import.meta.url);
-const serviceAccountKey = require("../../../blog-website-001-firebase-adminsdk-fbsvc-1cbf77c0ff.json");
+import admin from "firebase-admin";
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccountKey)
-});
+if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.cert({
+      projectId: process.env.FIREBASE_PROJECT_ID,
+      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+      privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n")
+    })
+  });
+}
 
 // Regex validations
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -58,17 +60,19 @@ export const signup = async (req, res) => {
         .json({ success: false, message: "Please fill all the fields" });
     }
 
-    // if (!emailRegex.test(email)) {
-    //   return res.status(400).json({ success: false, message: "Invalid email format" });
-    // }
+    if (!emailRegex.test(email)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid email format" });
+    }
 
-    // if (!passwordRegex.test(password)) {
-    //   return res.status(400).json({
-    //     success: false,
-    //     message:
-    //       "Password must be at least 6 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*?&).",
-    //   });
-    // }
+    if (!passwordRegex.test(password)) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Password must be at least 6 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*?&)."
+      });
+    }
 
     // Check if user already exists
     const existingUser = await User.findOne({ "personal_info.email": email });

@@ -2,32 +2,26 @@ import { GoogleAuthProvider, getAuth, signInWithPopup } from "firebase/auth";
 import { initializeApp } from "firebase/app";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDEJBdmLl_iVfo85BODAwVSkYdgRqqYESo",
-  authDomain: "blog-website-001.firebaseapp.com",
-  projectId: "blog-website-001",
-  storageBucket: "blog-website-001.appspot.com",
-  messagingSenderId: "666691635401",
-  measurementId: "G-RMHEY1ZQED",
-  appId: "1:666691635401:web:5c45c3642288cda3e46518"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-// Initialize Auth
 const provider = new GoogleAuthProvider();
 const auth = getAuth(app);
 
 export const authWithGoogle = async () => {
-  let user = null;
   try {
     const result = await signInWithPopup(auth, provider);
-
-    //! BUG FIXXXED
-    //* this user will contain the access token as accessToken, google provides it
-    user = result.user; 
+    return result.user;
   } catch (error) {
-    console.error("Error during Google sign-in:", error);
+    console.error("Google sign-in failed:", error);
+    return null;
   }
-  return user;
 };
