@@ -10,8 +10,8 @@ const connectDB = async () => {
     });
     console.log("✅ Database Connected Successfully");
   } catch (error) {
-    console.error("❌ Database Connection Failed:", error.message);
-    // Optional: Retry Connection After Delay
+    console.error("❌ Database Connection Fail:", error.message);
+
     setTimeout(connectDB, 5000);
   }
 };

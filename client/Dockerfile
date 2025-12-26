@@ -19,6 +19,10 @@ RUN rm /etc/nginx/conf.d/default.conf
 # 4️⃣ Copy custom nginx config
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
+
+# ⬇️ copy env file BEFORE build
+COPY .env.production .env.production
+
 # 5️⃣ Copy built files
 COPY --from=build /app/dist /usr/share/nginx/html
 

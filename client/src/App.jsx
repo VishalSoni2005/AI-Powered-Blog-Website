@@ -17,7 +17,9 @@ const App = () => {
   useEffect(() => {
     let userInSession = lookInSession("user"); //* this fetches jwt token and username from session as accrss token
 
-    userInSession ? setUserAuth(JSON.parse(userInSession)) : setUserAuth({ access_token: null });
+    userInSession
+      ? setUserAuth(JSON.parse(userInSession))
+      : setUserAuth({ access_token: null });
   }, []);
 
   return (
