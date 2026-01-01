@@ -54,7 +54,6 @@ build/
 .env.test
 
 # Google Cloud specific service account keys
-*.json
 *.pem
 *.key
 

@@ -13,7 +13,7 @@ export default function PublishForm() {
   let tagLimit = 10;
 
   let {
-    userAuth: { access_token }
+    userAuth: { access_token },
   } = useContext(UserContext);
 
   let {
@@ -21,7 +21,7 @@ export default function PublishForm() {
     blog: { banner, content, title, tags, des },
     setBlog,
     editorState, // by default editor
-    setEditorState
+    setEditorState,
   } = useContext(EditorContext);
 
   //* this is blog object taken from editor context
@@ -106,7 +106,7 @@ export default function PublishForm() {
   //     draft: false
   //   };
 
-  //   axios.post("http://localhost:3000/create-blog", blogObject, {
+  //   axios.post("http://localhost:8080/create-blog", blogObject, {
   //     headers: {
   //       // "Content-Type": "application/json",
   //       Authorization: `Bearer ${access_token}`
@@ -170,17 +170,17 @@ export default function PublishForm() {
         des,
         tags,
         banner,
-        draft: false
+        draft: false,
       };
       console.log(blogObject);
 
       await axios.post(
-        "http://localhost:3000/create-blog",
+        "http://localhost:8080/create-blog",
         { ...blogObject, id: blog_id },
         {
           headers: {
-            Authorization: `Bearer ${access_token}`
-          }
+            Authorization: `Bearer ${access_token}`,
+          },
         }
       );
 
@@ -205,7 +205,8 @@ export default function PublishForm() {
 
         <button
           onClick={handleClick}
-          className="absolute right-[5vw] top-[5%] z-10 h-12 w-12 lg:top-[10%]">
+          className="absolute right-[5vw] top-[5%] z-10 h-12 w-12 lg:top-[10%]"
+        >
           <i className="ff fi-br-cross"></i>
         </button>
 
@@ -214,9 +215,13 @@ export default function PublishForm() {
           <div className="bg-grey mt-4 aspect-video w-full overflow-hidden rounded-lg">
             <img src={banner} alt="" />
           </div>
-          <h1 className="mt-2 line-clamp-2 text-4xl font-medium leading-tight">{title}</h1>
+          <h1 className="mt-2 line-clamp-2 text-4xl font-medium leading-tight">
+            {title}
+          </h1>
 
-          <p className="font-gelasio mt-4 line-clamp-2 text-xl leading-7">{des}</p>
+          <p className="font-gelasio mt-4 line-clamp-2 text-xl leading-7">
+            {des}
+          </p>
         </div>
 
         <div className="border-grey lg:border-1 lg:pl-8">
@@ -228,14 +233,17 @@ export default function PublishForm() {
             className="input-box pl-4"
             onChange={handleBlogTitleChange}
           />
-          <p className="text-dark-grey mb-2 mt-9">Short Description About Your Blog</p>
+          <p className="text-dark-grey mb-2 mt-9">
+            Short Description About Your Blog
+          </p>
           <textarea
             maxLength={charLimit}
             placeholder="Short Description About Your Blog"
             className="input-box h-40 resize-none pl-4 leading-7"
             onChange={(e) => setBlog({ ...blog, des: e.target.value })}
             defaultValue={des}
-            onKeyDown={handleTitleKeyDown}></textarea>
+            onKeyDown={handleTitleKeyDown}
+          ></textarea>
           <p className="text-dark-grey mt-1 text-right text-sm">
             {charLimit - des.length} Characters left
           </p>

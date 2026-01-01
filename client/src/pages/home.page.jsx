@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import AnimationWrapper from "../common/page-animation";
 import axios from "axios";
-import InPageNavigation, { activeTabRef } from "../components/inpage-navigation.component";
+import InPageNavigation, {
+  activeTabRef,
+} from "../components/inpage-navigation.component";
 import Loader from "../components/loader.component";
 import BlogPostCard from "../components/blog-post.component";
 import MinimalBlogPost from "../components/nobanner-blog-post.component";
@@ -31,12 +33,12 @@ export default function HomePage() {
     "property",
     "politics",
     "manipulation",
-    "psychological"
+    "psychological",
   ];
 
   // const getBlogsByCategory = async ({ page = 1 }) => {
   //   try {
-  //     const request = await axios.post("http://localhost:3000/search-blogs", {
+  //     const request = await axios.post("http://localhost:8080/search-blogs", {
   //       tag: pageState,
   //       page
   //     });
@@ -58,9 +60,9 @@ export default function HomePage() {
 
   const getBlogsByCategory = async ({ page = 1 }) => {
     try {
-      const request = await axios.post("http://localhost:3000/search-blogs", {
+      const request = await axios.post("http://localhost:8080/search-blogs", {
         category: pageState, // ✅
-        page: Number(page) || 1 // ✅
+        page: Number(page) || 1, // ✅
       });
 
       //* request.data.blogs is an  [ {} _ {} ]
@@ -70,7 +72,7 @@ export default function HomePage() {
         data: request.data.blogs,
         page,
         countRoute: "/search-blogs-count",
-        data_to_send: { category: pageState } // ✅
+        data_to_send: { category: pageState }, // ✅
       });
 
       setBlogs(formatedData);
@@ -83,13 +85,16 @@ export default function HomePage() {
   const getLatestBlogs = async ({ page = 1 }) => {
     // use this funciton in useEffect to get latest blogs
     try {
-      const latestBlog = await axios.post("http://localhost:3000/latest-blogs", { page });
+      const latestBlog = await axios.post(
+        "http://localhost:8080/latest-blogs",
+        { page }
+      );
 
       const formatedData = await filterPaginationData({
         state: blogs,
         data: latestBlog.data.blogs,
         page,
-        countRoute: "/all-latest-blogs-count"
+        countRoute: "/all-latest-blogs-count",
       });
 
       console.log("Formatted blogs ==>> ", formatedData);
@@ -101,7 +106,9 @@ export default function HomePage() {
 
   const getTrendingBlogs = async () => {
     try {
-      const trendingBlog = await axios.get("http://localhost:3000/trending-blogs");
+      const trendingBlog = await axios.get(
+        "http://localhost:8080/trending-blogs"
+      );
 
       const blogsArray = trendingBlog.data.blogs;
 
@@ -144,15 +151,22 @@ export default function HomePage() {
         <div className="w-full">
           <InPageNavigation
             defaultHidden={["trending blogs"]}
-            routes={[pageState, "trending blogs"]}>
+            routes={[pageState, "trending blogs"]}
+          >
             <>
               {blogs == null ? (
                 <Loader />
               ) : blogs.results.length ? (
                 blogs.results.map((blog, i) => {
                   return (
-                    <AnimationWrapper transition={{ duration: 1, delay: i * 0.1 }} key={i}>
-                      <BlogPostCard content={blog} author={blog.author.personal_info} />
+                    <AnimationWrapper
+                      transition={{ duration: 1, delay: i * 0.1 }}
+                      key={i}
+                    >
+                      <BlogPostCard
+                        content={blog}
+                        author={blog.author.personal_info}
+                      />
                     </AnimationWrapper>
                   );
                 })
@@ -163,7 +177,9 @@ export default function HomePage() {
               {/* //! complex component  */}
               <LoadMoreDataBtn
                 state={blogs}
-                fetchDataFn={pageState == "home" ? getLatestBlogs : getBlogsByCategory}
+                fetchDataFn={
+                  pageState == "home" ? getLatestBlogs : getBlogsByCategory
+                }
               />
               {/* //* above LoadMoreDataBtn will change the page number */}
             </>
@@ -173,7 +189,10 @@ export default function HomePage() {
             ) : trendingBlogs.length ? (
               trendingBlogs.map((blog, i) => {
                 return (
-                  <AnimationWrapper transition={{ duration: 1, delay: i * 0.1 }} key={i}>
+                  <AnimationWrapper
+                    transition={{ duration: 1, delay: i * 0.1 }}
+                    key={i}
+                  >
                     <MinimalBlogPost blog={blog} index={i} />
                   </AnimationWrapper>
                 );
@@ -193,8 +212,12 @@ export default function HomePage() {
                 {categories.map((category, i) => (
                   <button
                     onClick={filterBlogsByCategory}
-                    className={`tag ` + (pageState == category ? "bg-black text-white" : "")}
-                    key={i}>
+                    className={
+                      `tag ` +
+                      (pageState == category ? "bg-black text-white" : "")
+                    }
+                    key={i}
+                  >
                     {category}
                   </button>
                 ))}
@@ -211,7 +234,10 @@ export default function HomePage() {
               ) : trendingBlogs.length ? (
                 trendingBlogs.map((blog, i) => {
                   return (
-                    <AnimationWrapper transition={{ duration: 1, delay: i * 0.1 }} key={i}>
+                    <AnimationWrapper
+                      transition={{ duration: 1, delay: i * 0.1 }}
+                      key={i}
+                    >
                       <MinimalBlogPost blog={blog} index={i} />
                     </AnimationWrapper>
                   );

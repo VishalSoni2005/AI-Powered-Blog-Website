@@ -12,7 +12,7 @@ const blogStructure = {
   content: [],
   tags: [],
   des: "",
-  author: { personal_info: {} }
+  author: { personal_info: {} },
 };
 
 export const EditorContext = createContext({}); //! creating new context for editor
@@ -24,39 +24,46 @@ export default function Editor() {
   const [editorState, setEditorState] = useState("editor");
   const [textEditor, setTextEditor] = useState({ isReady: false }); //*  used to manage the instance of the EditorJs editor and track whether it is ready for use.
 
-  const [loading, setLoading] = useState(true); 
+  const [loading, setLoading] = useState(true);
   let {
-    userAuth: { access_token }
+    userAuth: { access_token },
   } = useContext(UserContext);
 
- useEffect(() => {
-   if (!blog_id) {
-     return setLoading(false);
-   }
+  useEffect(() => {
+    if (!blog_id) {
+      return setLoading(false);
+    }
 
-   (async () => {
-     try {
-       const {
-         data: { blog }
-       } = await axios.post("http://localhost:3000/get-blog", {
-         blog_id,
-         draft: true,
-         mode: "edit"
-       });
-       setBlog(blog);
-     } catch (err) {
-       console.error("Error fetching blog", err);
-       setBlog(null);
-     } finally {
-       setLoading(false);
-     }
-   })();
- }, [blog_id]);
-
+    (async () => {
+      try {
+        const {
+          data: { blog },
+        } = await axios.post("http://localhost:8080/get-blog", {
+          blog_id,
+          draft: true,
+          mode: "edit",
+        });
+        setBlog(blog);
+      } catch (err) {
+        console.error("Error fetching blog", err);
+        setBlog(null);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [blog_id]);
 
   return (
     <EditorContext.Provider
-      value={{ blog, setBlog, editorState, setEditorState, textEditor, setTextEditor }}>
+      value={{
+        blog,
+        setBlog,
+        editorState,
+        setEditorState,
+        textEditor,
+        setTextEditor,
+      }}
+    >
       {access_token === null ? (
         <Navigate to="/signin" />
       ) : loading ? (

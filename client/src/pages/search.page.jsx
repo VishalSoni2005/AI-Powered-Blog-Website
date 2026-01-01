@@ -17,7 +17,10 @@ export default function SearchPage() {
 
   const searchBlogs = async ({ page = 1, createNewArray = false }) => {
     try {
-      const latestBlog = await axios.post("http://localhost:3000/search-blogs", { query, page });
+      const latestBlog = await axios.post(
+        "http://localhost:8080/search-blogs",
+        { query, page }
+      );
 
       const formatedData = await filterPaginationData({
         state: blogs,
@@ -25,7 +28,7 @@ export default function SearchPage() {
         page,
         countRoute: "/search-blogs-count",
         data_to_send: { query },
-        createNewArray
+        createNewArray,
       });
 
       setBlogs(formatedData); //! blog from backend is stored to useState form here
@@ -39,7 +42,9 @@ export default function SearchPage() {
   };
   const fetchUsers = async () => {
     try {
-      const response = await axios.post("http://localhost:3000/search-users", { query });
+      const response = await axios.post("http://localhost:8080/search-users", {
+        query,
+      });
       setUsers(response.data.users);
     } catch (err) {
       console.error("Error fetching users", err);
@@ -60,7 +65,10 @@ export default function SearchPage() {
         ) : users.length ? (
           users.map((user, i) => {
             return (
-              <AnimationWrapper transition={{ duration: 1, delay: i * 0.1 }} key={i}>
+              <AnimationWrapper
+                transition={{ duration: 1, delay: i * 0.1 }}
+                key={i}
+              >
                 <UserCard user={user} />
               </AnimationWrapper>
             );
@@ -77,15 +85,22 @@ export default function SearchPage() {
       <div className="w-full">
         <InPageNavigation
           routes={[`Search: Results from ${query}`, "Accounts Matched"]}
-          defaultHidden={["Accounts Matched"]}>
+          defaultHidden={["Accounts Matched"]}
+        >
           <>
             {blogs == null ? (
               <Loader />
             ) : blogs.results.length ? (
               blogs.results.map((blog, i) => {
                 return (
-                  <AnimationWrapper transition={{ duration: 1, delay: i * 0.1 }} key={i}>
-                    <BlogPostCard content={blog} author={blog.author.personal_info} />
+                  <AnimationWrapper
+                    transition={{ duration: 1, delay: i * 0.1 }}
+                    key={i}
+                  >
+                    <BlogPostCard
+                      content={blog}
+                      author={blog.author.personal_info}
+                    />
                   </AnimationWrapper>
                 );
               })

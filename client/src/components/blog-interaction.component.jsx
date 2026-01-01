@@ -16,16 +16,16 @@ export default function BlogInteraction() {
       activity,
       activity: { total_likes, total_reads, total_comments },
       author: {
-        personal_info: { username: author_username }
-      }
+        personal_info: { username: author_username },
+      },
     },
     setBlog,
     isLikedByUser,
-    setLikeByUser
+    setLikeByUser,
   } = useContext(BlogContext);
 
   let {
-    userAuth: { username, access_token }
+    userAuth: { username, access_token },
   } = useContext(UserContext);
 
   const handleLikeClick = async () => {
@@ -37,15 +37,15 @@ export default function BlogInteraction() {
         setBlog({ ...blog, activity: { ...activity, total_likes } });
 
         const response = await axios.post(
-          "http://localhost:3000/like-blog",
+          "http://localhost:8080/like-blog",
           {
             _id,
-            isLikedByUser
+            isLikedByUser,
           },
           {
             headers: {
-              Authorization: `Bearer ${access_token}`
-            }
+              Authorization: `Bearer ${access_token}`,
+            },
           }
         );
 
@@ -65,18 +65,17 @@ export default function BlogInteraction() {
       (async () => {
         try {
           const response = await axios.post(
-            "http://localhost:3000/isliked-by-user",
+            "http://localhost:8080/isliked-by-user",
             { _id },
             {
               headers: {
-                Authorization: `Bearer ${access_token}`
-              }
+                Authorization: `Bearer ${access_token}`,
+              },
             }
           );
 
           const result = response.data;
           setLikeByUser(result);
-
         } catch (err) {
           console.error("Error checking like status:", err);
         }
@@ -92,8 +91,13 @@ export default function BlogInteraction() {
         <div className="flex items-center gap-3">
           <button
             onClick={handleLikeClick}
-            className={`bg-grey/80 hover:bg-red/80 flex h-10 w-10 items-center justify-center rounded-full ${isLikedByUser} ? "bg-red" : ""`}>
-            <i className={"fi " + (isLikedByUser ? "fi-sr-heart" : " fi-rr-heart")}></i>
+            className={`bg-grey/80 hover:bg-red/80 flex h-10 w-10 items-center justify-center rounded-full ${isLikedByUser} ? "bg-red" : ""`}
+          >
+            <i
+              className={
+                "fi " + (isLikedByUser ? "fi-sr-heart" : " fi-rr-heart")
+              }
+            ></i>
           </button>
 
           <p className="text-dark-grey text-xl">{total_likes}</p>
@@ -113,7 +117,9 @@ export default function BlogInteraction() {
           ) : (
             " "
           )}
-          <Link to={`https://twitter.com/intent/tweet?text=Read${title}&url=${location.href}`}>
+          <Link
+            to={`https://twitter.com/intent/tweet?text=Read${title}&url=${location.href}`}
+          >
             <i className="fi fi-brands-x-twitter hover:text-twitter text-xl"></i>
           </Link>
         </div>

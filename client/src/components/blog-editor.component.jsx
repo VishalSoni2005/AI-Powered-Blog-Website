@@ -12,12 +12,12 @@ import { UserContext } from "../App";
 
 export default function BlogEditor() {
   let {
-    userAuth: { access_token }
+    userAuth: { access_token },
   } = useContext(UserContext);
 
   let navigate = useNavigate();
   let blogBannerRef = useRef();
-  const {blog_id} = useParams();
+  const { blog_id } = useParams();
 
   let {
     blog,
@@ -26,9 +26,8 @@ export default function BlogEditor() {
     textEditor,
     editorState,
     setTextEditor,
-    setEditorState
+    setEditorState,
   } = useContext(EditorContext);
-
 
   useEffect(() => {
     if (!textEditor.isReady) {
@@ -36,8 +35,8 @@ export default function BlogEditor() {
       const editor = new EditorJs({
         holderId: "textEditor",
         data: Array.isArray(content) ? content[0] : content,
-        tools: tools, 
-        placeholder: "Let's Share Your Story"
+        tools: tools,
+        placeholder: "Let's Share Your Story",
       });
 
       setTextEditor(editor);
@@ -58,7 +57,10 @@ export default function BlogEditor() {
     formData.append("file", file);
 
     try {
-      const response = await axios.post("http://localhost:3000/upload", formData);
+      const response = await axios.post(
+        "http://localhost:8080/upload",
+        formData
+      );
 
       const data = await response.data;
       let imgUrl = data.url;
@@ -147,14 +149,18 @@ export default function BlogEditor() {
         des,
         tags,
         banner,
-        draft: true
+        draft: true,
       };
       //! this is authorization header
-      await axios.post("http://localhost:3000/create-blog", {...blogObject, id: blog_id}, {
-        headers: {
-          Authorization: `Bearer ${access_token}`
+      await axios.post(
+        "http://localhost:8080/create-blog",
+        { ...blogObject, id: blog_id },
+        {
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+          },
         }
-      });
+      );
 
       toast.dismiss(loadingToast);
       toast.success("Blog saved successfully");
@@ -195,7 +201,7 @@ export default function BlogEditor() {
   //       };
 
   //       axios
-  //         .post("http://localhost:3000/create-blog", blogObject, {
+  //         .post("http://localhost:8080/create-blog", blogObject, {
   //           headers: {
   //             // "Content-Type": "application/json",
   //             Authorization: `Bearer ${access_token}`
@@ -273,7 +279,8 @@ export default function BlogEditor() {
               className="mt-10 h-20 w-full resize-none font-serif text-4xl font-medium leading-tight outline-none placeholder:opacity-40"
               onChange={handletitleChange}
               onKeyDown={handleTitleKeyDown}
-              id=""></textarea>
+              id=""
+            ></textarea>
             <hr className="my-10 w-full opacity-40" />
 
             {/* //* text editor */}

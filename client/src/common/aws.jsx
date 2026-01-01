@@ -4,17 +4,17 @@ export const uploadImage = async (img) => {
   try {
     // Step 1: Fetch the upload URL
     const {
-      data: { uploadURL }
-    } = await axios.get("http://localhost:3000/get-upload-url");
+      data: { uploadURL },
+    } = await axios.get("http://localhost:8080/get-upload-url");
 
     // Step 2: Upload the image using the fetched URL
     await axios({
       method: "PUT",
       url: uploadURL,
       headers: {
-        "Content-Type": "multipart/form-data"
+        "Content-Type": "multipart/form-data",
       },
-      data: img
+      data: img,
     });
 
     // Step 3: Construct the final image URL

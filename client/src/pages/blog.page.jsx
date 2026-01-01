@@ -15,7 +15,7 @@ export const blogStructure = {
   content: [],
   tags: [],
   author: { personal_info: {} },
-  publishedAt: ""
+  publishedAt: "",
 };
 
 export const BlogContext = createContext({});
@@ -34,9 +34,9 @@ export default function BlogPage() {
     banner,
     content,
     author: {
-      personal_info: { fullname, username: author_username, profile_img }
+      personal_info: { fullname, username: author_username, profile_img },
     },
-    publishedAt
+    publishedAt,
   } = blog;
 
   const fetchBlog = async () => {
@@ -44,15 +44,15 @@ export default function BlogPage() {
       setLoading(true);
 
       const {
-        data: { blog }
-      } = await axios.post("http://localhost:3000/get-blog", { blog_id });
+        data: { blog },
+      } = await axios.post("http://localhost:8080/get-blog", { blog_id });
 
       setBlog(blog);
 
-      const { data } = await axios.post("http://localhost:3000/search-blogs", {
+      const { data } = await axios.post("http://localhost:8080/search-blogs", {
         tag: blog.tags[0] || "",
         limit: 6,
-        eliminate_blog: blog_id
+        eliminate_blog: blog_id,
       });
 
       setsimilarBlogs(data.blogs);
@@ -77,7 +77,9 @@ export default function BlogPage() {
       {loading ? (
         <Loader />
       ) : (
-        <BlogContext.Provider value={{ blog, setBlog, isLikedByUser, setLikeByUser }}>
+        <BlogContext.Provider
+          value={{ blog, setBlog, isLikedByUser, setLikeByUser }}
+        >
           <div className="center max-w-[900px] py-10 max-lg:px-[5vw]">
             <img src={banner} className="aspect-video" alt="" />
 
@@ -86,11 +88,19 @@ export default function BlogPage() {
 
               <div className="my-8 flex justify-between max-sm:flex-col">
                 <div className="flex items-start gap-5">
-                  <img src={profile_img} className="h-12 w-12 rounded-full" alt="" />
+                  <img
+                    src={profile_img}
+                    className="h-12 w-12 rounded-full"
+                    alt=""
+                  />
                   <p className="Capitalize">
                     {fullname}
-                    <br />@{/* on clicking the below link it will redirect to user profile */}
-                    <Link to={`/user/${author_username}`} className="text-dark-grey underline">
+                    <br />@
+                    {/* on clicking the below link it will redirect to user profile */}
+                    <Link
+                      to={`/user/${author_username}`}
+                      className="text-dark-grey underline"
+                    >
                       {author_username}
                     </Link>
                   </p>
@@ -117,14 +127,19 @@ export default function BlogPage() {
 
             {similarBlogs != null && similarBlogs.length ? (
               <>
-                <h1 className="mb-10 mt-14 text-2xl font-medium">Similar Blogs</h1>
+                <h1 className="mb-10 mt-14 text-2xl font-medium">
+                  Similar Blogs
+                </h1>
                 {similarBlogs.map((blog, i) => {
                   let {
-                    author: { personal_info }
+                    author: { personal_info },
                   } = blog;
 
                   return (
-                    <AnimationWrapper key={i} transition={{ duration: 1, delay: i * 0.1 }}>
+                    <AnimationWrapper
+                      key={i}
+                      transition={{ duration: 1, delay: i * 0.1 }}
+                    >
                       <BlogPostCard content={blog} author={personal_info} />
                     </AnimationWrapper>
                   );

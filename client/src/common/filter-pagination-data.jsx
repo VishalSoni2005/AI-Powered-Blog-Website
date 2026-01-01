@@ -7,7 +7,7 @@ export const filterPaginationData = async ({
   page,
   arr,
   countRoute,
-  data_to_send = {}
+  data_to_send = {},
 }) => {
   let obj;
 
@@ -15,14 +15,14 @@ export const filterPaginationData = async ({
     obj = { ...state, results: [...state.results, ...data], page: page };
   } else {
     await axios
-      .post(`http://localhost:3000${countRoute}`, data_to_send)
+      .post(`http://localhost:8080${countRoute}`, data_to_send)
       .then(({ data: { totalDocs } }) => {
         obj = {
           results: data,
           page: 1,
-          totalDocs
+          totalDocs,
         };
-       // console.log("Data after filtering:", obj);
+        // console.log("Data after filtering:", obj);
       })
       .catch((err) => console.log(err));
   }

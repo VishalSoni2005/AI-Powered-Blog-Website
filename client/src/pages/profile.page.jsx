@@ -17,19 +17,19 @@ export const profileStructure = {
     username: "",
     fullname: "",
     profile_img: "",
-    bio: ""
+    bio: "",
   },
   account_info: {
     total_posts: 0,
-    total_reads: 0
+    total_reads: 0,
   },
   social_links: {},
-  joinedAt: ""
+  joinedAt: "",
 };
 
 const ProfilePage = () => {
   let {
-    userAuth: { username }
+    userAuth: { username },
   } = useContext(UserContext);
   //* userContext contain, access_token and username
 
@@ -43,20 +43,19 @@ const ProfilePage = () => {
     personal_info: { username: profile_username, fullname, profile_img, bio },
     account_info: { total_posts, total_reads },
     social_links,
-    joinedAt
+    joinedAt,
   } = profile;
 
   const fetchUserProfile = async () => {
     try {
-      const request = await axios.post("http://localhost:3000/get-profile", {
-        username: profileId
+      const request = await axios.post("http://localhost:8080/get-profile", {
+        username: profileId,
       });
 
       const { user } = request.data;
       console.log(user);
 
-      if(user != null) {
-
+      if (user != null) {
         setProfile(user);
       }
       setProfileLoaded(profileId);
@@ -65,7 +64,10 @@ const ProfilePage = () => {
     } catch (error) {
       setLoading(false);
       if (error.response) {
-        console.error("Error fetching user profile:", error.response.data.message);
+        console.error(
+          "Error fetching user profile:",
+          error.response.data.message
+        );
       } else if (error.request) {
         console.error("No response received from the server");
       } else {
@@ -85,14 +87,14 @@ const ProfilePage = () => {
     user_id = user_id == undefined ? blogs.user_id : user_id;
 
     axios
-      .post("http://localhost:3000/search-blogs", { author: user_id, page })
+      .post("http://localhost:8080/search-blogs", { author: user_id, page })
       .then(async ({ data }) => {
         let formatedData = await filterPaginationData({
           state: blogs,
           data: data.blogs,
           page,
           countRoute: "/search-blogs-count",
-          data_to_send: { author: user_id }
+          data_to_send: { author: user_id },
         });
 
         formatedData.user_id = user_id;
@@ -127,12 +129,17 @@ const ProfilePage = () => {
             <h1 className="text-2xl font-medium">@{profile_username}</h1>
             <p className="h-6 text-xl capitalize">{fullname}</p>
             <p>
-              {total_posts.toLocaleString()} Blogs - {total_reads.toLocaleString()} Reads
+              {total_posts.toLocaleString()} Blogs -{" "}
+              {total_reads.toLocaleString()} Reads
             </p>
-            //* now we make an edit profile btn, it is visible when you are loged in
+            //* now we make an edit profile btn, it is visible when you are
+            loged in
             <div className="mt-2 flex gap-4">
               {profileId == username ? (
-                <Link to="/settings/edit-profile" className="btn-light rounded-md">
+                <Link
+                  to="/settings/edit-profile"
+                  className="btn-light rounded-md"
+                >
                   Edit Profile
                 </Link>
               ) : (
@@ -148,15 +155,24 @@ const ProfilePage = () => {
           </div>
 
           <div className="w-full max-md:mt-12">
-            <InPageNavigation defaultHidden={["About"]} routes={["Blogs Published", "About"]}>
+            <InPageNavigation
+              defaultHidden={["About"]}
+              routes={["Blogs Published", "About"]}
+            >
               <>
                 {blogs == null ? (
                   <Loader />
                 ) : blogs.results.length ? (
                   blogs.results.map((blog, i) => {
                     return (
-                      <AnimationWrapper transition={{ duration: 1, delay: i * 0.1 }} key={i}>
-                        <BlogPostCard content={blog} author={blog.author.personal_info} />
+                      <AnimationWrapper
+                        transition={{ duration: 1, delay: i * 0.1 }}
+                        key={i}
+                      >
+                        <BlogPostCard
+                          content={blog}
+                          author={blog.author.personal_info}
+                        />
                       </AnimationWrapper>
                     );
                   })
@@ -168,7 +184,11 @@ const ProfilePage = () => {
                 <LoadMoreDataBtn state={blogs} fetchDataFn={getBlogs} />
                 {/* //* above LoadMoreDataBtn will change the page number */}
               </>
-              <AboutUser bio={bio} social_links={social_links} joinedAt={joinedAt} />
+              <AboutUser
+                bio={bio}
+                social_links={social_links}
+                joinedAt={joinedAt}
+              />
             </InPageNavigation>
           </div>
         </section>

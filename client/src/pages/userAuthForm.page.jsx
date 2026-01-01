@@ -21,7 +21,7 @@ export default function AuthForm({ type }) {
 
   const userAuthThroughServer = async (route, data) => {
     try {
-      const response = await axios.post(`http://localhost:3000${route}`, data);
+      const response = await axios.post(`http://localhost:8080${route}`, data);
 
       if (!response.data || !response.data.access_token) {
         throw new Error("Invalid server response: Missing access token");
@@ -48,7 +48,7 @@ export default function AuthForm({ type }) {
       console.error("Authentication Error:", error);
       console.error(
         "request to : ",
-        `http://localhost:3000${route}`,
+        `http://localhost:8080${route}`,
         "and the data is : ",
         data
       );
